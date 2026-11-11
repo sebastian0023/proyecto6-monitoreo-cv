@@ -1,0 +1,16 @@
+# Entornos y cachés
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.DS_Store
+
+# Pesos del detector: se descargan con scripts/descargar_modelo.py (URL pública + SHA-256)
+modelo/*.onnx
+
+# Grabaciones originales de QuickTime (pesadas); en Git solo van las versiones 640x480
+datos/videos/originales/
+
+# Corridas locales; la evidencia de entrega se copia a evidencias/
+resultados/
