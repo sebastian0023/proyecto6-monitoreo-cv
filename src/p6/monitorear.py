@@ -4,7 +4,7 @@
         --config config/monitoreo.yaml --run-id c1-normal
 
 Los cuadros se acumulan por ventana. Al cerrarse una ventana se evalúan las reglas de alerta
-(si hay un evaluador), se decide qué cuadros conservar como imagen (`p6.capturas`), se valida
+(`p6.alertas`), se decide qué cuadros conservar como imagen (`p6.capturas`), se valida
 cada evento con el contrato y se guardan en la base de datos. Por corrida queda:
 
 - `resultados/monitoreo.db` (`--db`): corridas, eventos y alertas (ver `p6.almacen`).
@@ -41,6 +41,7 @@ import numpy as np
 import psutil
 
 from p6 import capturas
+from p6.alertas import EvaluadorReglas
 from p6.almacen import Almacen, AlmacenError
 from p6.config import Config, ConfigError, cargar_config
 from p6.contrato import ValidadorEventos
@@ -53,7 +54,7 @@ RAIZ = Path(__file__).resolve().parents[2]
 # zona y la ventana (#5) y H4 la captura vinculada (#6).
 ETAPA_CONTRATO = "H4"
 # Recibe el resumen de una ventana recién cerrada y sus eventos; devuelve las alertas que
-# esa ventana abrió, actualizó o cerró (las reglas son de #7).
+# esa ventana abrió, extendió o cerró (por defecto, las reglas A y B de p6.alertas).
 EvaluadorVentanas = Callable[[dict[str, Any], list[dict[str, Any]]], list[dict[str, Any]]]
 RUN_ID_VALIDO = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*")
 
@@ -71,7 +72,7 @@ class Totales:
     capturas: dict[str, int] = field(
         default_factory=lambda: {m: 0 for m in ("baja", "ventana_alerta", "muestra")}
     )
-    alertas: set[str] = field(default_factory=set)
+    alertas: dict[str, dict[str, Any]] = field(default_factory=dict)
 
 
 def percentil(valores: list[float], p: float) -> float | None:
@@ -193,9 +194,12 @@ def correr(
     """Procesa la fuente y devuelve el contenido de run.json y los totales.
 
     Reemplaza cualquier dato previo de `run_id` (la CLI solo lo permite con `--sobrescribir`).
-    Sin `almacen` usa `<carpeta>/../monitoreo.db`.
+    Sin `almacen` usa `<carpeta>/../monitoreo.db`. Sin `evaluador` aplica las reglas A y B de
+    la configuración (`p6.alertas.EvaluadorReglas`).
     """
     propio = almacen is None
+    if evaluador is None:
+        evaluador = EvaluadorReglas(cfg, run_id)
     db = almacen if almacen is not None else Almacen(carpeta.parent / "monitoreo.db")
     try:
         return _correr(fuente, detector, cfg, run_id, carpeta, max_cuadros, imprimir, db, evaluador)
@@ -254,6 +258,17 @@ def _correr(
             "minimo_con_detecciones": cfg.confianza.minimo_con_detecciones,
             "referencia_run_id": cfg.referencia.run_id,
             "p_ref": cfg.referencia.p_ref,
+            "regla_A": {
+                "condicion": "proporción baja >= proporcion_minima en una ventana suficiente",
+                "proporcion_minima": cfg.regla_a.proporcion_minima,
+                "severidad": cfg.regla_a.severidad,
+            },
+            "regla_B": {
+                "condicion": "proporción baja > p_ref + margen en N ventanas suficientes seguidas",
+                "limite": round(cfg.referencia.p_ref + cfg.regla_b.margen_sobre_referencia, 4),
+                "ventanas_seguidas": cfg.regla_b.ventanas_seguidas,
+                "severidad": cfg.regla_b.severidad,
+            },
         },
         "politica_capturas": capturas.descripcion(),
         "archivos": {
@@ -282,6 +297,11 @@ def _correr(
         )
         alertas = evaluador(resumen, eventos) if evaluador is not None else []
         abrio = any(a["opened_window_id"] == wid for a in alertas)
+        for a in alertas:
+            if a["opened_window_id"] == wid:
+                imprimir(f"ALERTA {a['alert_id']} abierta ({a['severity']}): {a['reason']}")
+            elif a["closed_window_id"] == wid:
+                imprimir(f"ALERTA {a['alert_id']} cerrada en la ventana {wid}")
         aceptados = []
         for evento, imagen in pendientes:
             razon = capturas.motivo(evento, abrio)
@@ -316,7 +336,17 @@ def _correr(
         db.insertar_eventos(aceptados)
         if alertas:
             db.guardar_alertas(alertas)
-            totales.alertas.update(a["alert_id"] for a in alertas)
+            for a in alertas:
+                totales.alertas[a["alert_id"]] = {
+                    k: a[k]
+                    for k in (
+                        "rule_id",
+                        "severity",
+                        "status",
+                        "opened_window_id",
+                        "closed_window_id",
+                    )
+                }
         pendientes.clear()
 
     error_fuente: FuenteError | None = None
@@ -367,6 +397,7 @@ def _correr(
         "zonas": totales.zonas,
         "capturas": {**totales.capturas, "total": sum(totales.capturas.values())},
         "alertas": len(totales.alertas),
+        "alertas_detalle": totales.alertas,
         "ventanas": resumir_ventanas(
             totales.resumen_eventos,
             cfg.confianza.ventana_cuadros,

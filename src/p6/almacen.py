@@ -298,14 +298,18 @@ class Almacen:
             self._con.executemany(sql, filas)
         return len(filas)
 
-    def alertas(self, run_id: str | None = None) -> list[dict[str, Any]]:
-        if run_id:
-            filas = self._con.execute(
-                "SELECT * FROM alertas WHERE run_id = ? ORDER BY opened_window_id, alert_id",
-                (run_id,),
-            )
-        else:
-            filas = self._con.execute("SELECT * FROM alertas ORDER BY run_id, opened_window_id")
+    def alertas(
+        self, run_id: str | None = None, status: str | None = None, rule_id: str | None = None
+    ) -> list[dict[str, Any]]:
+        condiciones, args = [], []
+        for columna, valor in (("run_id", run_id), ("status", status), ("rule_id", rule_id)):
+            if valor:
+                condiciones.append(f"{columna} = ?")
+                args.append(valor)
+        where = f"WHERE {' AND '.join(condiciones)}" if condiciones else ""
+        filas = self._con.execute(
+            f"SELECT * FROM alertas {where} ORDER BY run_id, opened_window_id, alert_id", args
+        )
         return [_fila_a_dict(CAMPOS_ALERTA, f) for f in filas]
 
     def alerta(self, alert_id: str) -> dict[str, Any] | None:

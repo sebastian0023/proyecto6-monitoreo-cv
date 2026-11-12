@@ -134,14 +134,14 @@ Una alerta por episodio continuo de una regla (ver `docs/PLAN.md`, sección 7): 
 | `rule_id` | texto | no | Regla que la generó (`A`, `B`, `C`), definida en `config/monitoreo.yaml` |
 | `run_id` | texto | no | Corrida |
 | `status` | texto | no | `abierta` o `cerrada` |
-| `opened_at` | fecha | no | Instante en que se abrió |
+| `opened_at` | fecha | no | Instante en que se abrió: `t_capture_utc` del último cuadro de la ventana de apertura |
 | `opened_window_id` | entero ≥ 1 | no | Ventana en que se abrió. Debe estar en `window_ids` |
 | `closed_at` | fecha | sí | Instante de cierre. Nulo mientras esté abierta |
 | `closed_window_id` | entero | sí | Ventana de cierre. Nulo mientras esté abierta |
 | `severity` | texto | no | `info`, `warning` o `critical` |
 | `reason` | texto | no | Qué se midió y contra qué límite, con los valores |
 | `window_ids` | lista de enteros | no | Ventanas que explican la alerta (no vacía) |
-| `event_ids` | lista de textos | no | Eventos que explican la alerta (no vacía) |
+| `event_ids` | lista de textos | no | Eventos que explican la alerta (no vacía): los cuadros en zona baja de sus ventanas |
 | `config_sha256` | texto | no | Configuración vigente al abrirla |
 | `suggested_action` | texto | no | Acción sugerida para quien la investiga |
 

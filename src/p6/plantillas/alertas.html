@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% import "macros.html" as m %}
+{% block titulo %}Alertas{% endblock %}
+{% block contenido %}
+<h1>Alertas</h1>
+<p class="sub">Una alerta por episodio continuo de una regla. {{ alertas|length }} alerta{{ '' if alertas|length == 1 else 's' }} con estos filtros.</p>
+
+<form class="filtros" method="get" action="/alertas">
+  <label>Corrida
+    <select name="run_id">
+      <option value="">todas</option>
+      {% for c in corridas %}<option value="{{ c.run_id }}" {{ 'selected' if filtros.run_id == c.run_id }}>{{ c.run_id }}</option>{% endfor %}
+    </select>
+  </label>
+  <label>Estado
+    <select name="status">
+      <option value="">todos</option>
+      {% for s in estados %}<option value="{{ s }}" {{ 'selected' if filtros.status == s }}>{{ s }}</option>{% endfor %}
+    </select>
+  </label>
+  <label>Regla
+    <select name="regla">
+      <option value="">todas</option>
+      {% for r in ['A', 'B'] %}<option value="{{ r }}" {{ 'selected' if filtros.rule_id == r }}>{{ r }}</option>{% endfor %}
+    </select>
+  </label>
+  <button type="submit">Filtrar</button>
+  <a href="/alertas">Quitar filtros</a>
+</form>
+
+{% if alertas %}
+<div class="tabla-scroll">
+<table>
+  <thead><tr><th>Alerta</th><th>Corrida</th><th>Regla</th><th>Severidad</th><th>Estado</th>
+    <th>Se abrió</th><th>Se cerró</th><th>Motivo</th><th class="num">Eventos</th></tr></thead>
+  <tbody>
+  {% for a in alertas %}
+    {% set r = (reglas.get(a.run_id) or {}).get(a.rule_id) or {} %}
+    <tr>
+      <td class="mono nowrap"><a href="/alertas/{{ a.alert_id }}">{{ a.alert_id }}</a></td>
+      <td><a href="/corridas/{{ a.run_id }}">{{ a.run_id }}</a></td>
+      <td>{{ a.rule_id }}{% if r.nombre %} · {{ r.nombre }}{% endif %}</td>
+      <td>{{ m.severidad(a.severity) }}</td>
+      <td>{{ m.estado_alerta(a.status) }}</td>
+      <td class="nowrap"><span class="mono">{{ a.opened_at[:10] }}<br>{{ a.opened_at[11:23] }}</span><br><small>ventana {{ a.opened_window_id }}</small></td>
+      <td class="nowrap">{% if a.closed_at %}<span class="mono">{{ a.closed_at[:10] }}<br>{{ a.closed_at[11:23] }}</span><br><small>ventana {{ a.closed_window_id }}</small>{% else %}sigue abierta{% endif %}</td>
+      <td>{{ a.reason }}</td>
+      <td class="num">{{ a.event_ids|length }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% else %}
+<div class="aviso">No hay alertas con estos filtros. Una corrida sin alertas no significa que falten datos: revisa sus ventanas en <a href="/corridas">Corridas</a>.</div>
+{% endif %}
+{% endblock %}

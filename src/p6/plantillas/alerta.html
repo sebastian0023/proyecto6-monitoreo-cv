@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% import "macros.html" as m %}
+{% block titulo %}Alerta {{ a.alert_id }}{% endblock %}
+{% block contenido %}
+<p class="sub"><a href="/alertas">Alertas</a> · <a href="/corridas/{{ a.run_id }}">Corrida {{ a.run_id }}</a></p>
+<h1 class="mono">{{ a.alert_id }}</h1>
+<p class="sub">Regla {{ a.rule_id }}{% if regla.nombre %} · {{ regla.nombre }}{% endif %}</p>
+
+<div class="grid">
+  <div class="dato"><div class="k">Severidad</div><div class="v">{{ m.severidad(a.severity) }}</div></div>
+  <div class="dato"><div class="k">Estado</div><div class="v">{{ m.estado_alerta(a.status) }}</div></div>
+  <div class="dato"><div class="k">Se abrió</div><div class="v"><a href="/eventos?run_id={{ a.run_id }}&ventana={{ a.opened_window_id }}">ventana {{ a.opened_window_id }}</a></div><div class="mono">{{ a.opened_at }}</div></div>
+  <div class="dato"><div class="k">Se cerró</div><div class="v">{% if a.closed_window_id %}<a href="/eventos?run_id={{ a.run_id }}&ventana={{ a.closed_window_id }}">ventana {{ a.closed_window_id }}</a>{% else %}sigue abierta{% endif %}</div>{% if a.closed_at %}<div class="mono">{{ a.closed_at }}</div>{% endif %}</div>
+  <div class="dato"><div class="k">Eventos que la explican</div><div class="v">{{ a.event_ids|length }}</div></div>
+</div>
+
+<h2>Motivo</h2>
+<div class="aviso {{ 'error' if a.severity == 'critical' else '' }}">{{ a.reason }}</div>
+<p><strong>Acción sugerida:</strong> {{ a.suggested_action }}</p>
+
+<h2>Regla</h2>
+<div class="panel"><dl class="campos">
+  {% if a.rule_id == 'A' %}
+  <dt>Condición</dt><dd>En una ventana con evidencia suficiente, la proporción de cuadros en zona baja es ≥ {{ regla.proporcion_minima }}</dd>
+  {% else %}
+  <dt>Condición</dt><dd>La proporción de cuadros en zona baja supera p_ref + {{ regla.margen_sobre_referencia }}{% if politica.regla_B %} = {{ politica.regla_B.limite }}{% endif %} en {{ regla.ventanas_seguidas }} ventanas suficientes seguidas</dd>
+  {% endif %}
+  <dt>Ventana</dt><dd>{{ politica.ventana_cuadros }} cuadros; suficiente con al menos {{ politica.minimo_con_detecciones }} con detecciones. Las ventanas insuficientes no abren, no cierran ni rompen la racha</dd>
+  <dt>Umbrales</dt><dd>baja si frame_score &lt; {{ politica.umbral_inferior }} · p_ref {{ politica.p_ref }} ({{ politica.referencia_run_id }})</dd>
+  <dt>Configuración</dt><dd><a class="mono" href="/configuracion/{{ a.config_sha256 }}">{{ a.config_sha256 }}</a></dd>
+  <dt>Política completa</dt><dd><a href="https://github.com/sebastian0023/proyecto6-monitoreo-cv/blob/main/docs/politica.md">docs/politica.md</a></dd>
+</dl></div>
+
+<h2>Ventanas ({{ ventanas|length }})</h2>
+<div class="tabla-scroll">
+<table>
+  <thead><tr><th class="num">Ventana</th><th class="num">Con detecciones</th><th class="num">Baja</th><th class="num">Proporción baja</th><th>Todos sus cuadros</th></tr></thead>
+  <tbody>
+  {% for v in ventanas %}
+    <tr>
+      <td class="num">{{ v.window_id }}{% if v.window_id == a.opened_window_id %} <small>(abrió)</small>{% endif %}</td>
+      <td class="num">{{ v.con_detecciones if v.con_detecciones is defined else '—' }}</td>
+      <td class="num">{{ v.baja if v.baja is defined else '—' }}</td>
+      <td class="num">{% if v.proporcion_baja is defined %}{% if v.suficiente %}{{ '%.2f'|format(v.proporcion_baja) }}{% else %}insuficiente{% endif %}{% else %}—{% endif %}</td>
+      <td><a href="/eventos?run_id={{ a.run_id }}&ventana={{ v.window_id }}">ver los cuadros de la ventana {{ v.window_id }}</a></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+
+<h2>Eventos que la explican ({{ eventos|length }})</h2>
+<p class="sub">Los cuadros en zona baja de esas ventanas, con su captura.</p>
+<div class="tabla-scroll">
+<table>
+  <thead><tr><th>Evento</th><th class="num">Cuadro</th><th class="num">Ventana</th><th>Zona</th><th class="num">frame_score</th><th>Captura</th></tr></thead>
+  <tbody>
+  {% for e in eventos %}
+    {% if e._falta %}
+    <tr><td class="mono">{{ e.event_id }}</td><td colspan="5"><span class="etq c-rota">el evento no está en la base de datos</span></td></tr>
+    {% else %}
+    <tr>
+      <td class="mono"><a href="/eventos/{{ e.event_id }}">{{ e.event_id }}</a></td>
+      <td class="num">{{ e.frame_id }}</td>
+      <td class="num">{{ e.window_id }}</td>
+      <td>{{ m.zona(e.zone) }}</td>
+      <td class="num">{{ m.score(e.frame_score) }}</td>
+      <td>{% if e._captura == 'ok' %}<a href="/eventos/{{ e.event_id }}"><img src="/capturas/{{ e.event_id }}" alt="captura de {{ e.event_id }}" width="128" loading="lazy" style="border-radius:4px;display:block"></a>{% else %}{{ m.captura(e._captura, estado_captura_texto) }}{% endif %}</td>
+    </tr>
+    {% endif %}
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

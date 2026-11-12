@@ -99,7 +99,12 @@ La regla C del plan (evidencia insuficiente sostenida) es opcional y no se imple
 
 - Una alerta se **abre** al cumplirse la condición y se **cierra** en la primera ventana suficiente en que deja de cumplirse. Un episodio continuo produce **una** alerta, no una por ventana.
 - Las ventanas `insuficiente` **no suman ni rompen la racha** de la regla B y **no cierran** una alerta abierta: sin evidencia no se puede afirmar que el problema terminó.
-- El `reason` de cada alerta lleva los valores medidos y los límites.
+- El `reason` de cada alerta lleva los valores medidos y los límites, y se completa si la alerta sigue o se cierra. Por ejemplo: «proporción de baja confianza 0.70 ≥ 0.50 en la ventana 1 (14 de 20 cuadros con detecciones); sigue en las ventanas 2, 3 (proporciones 0.85, 0.80); se cerró en la ventana 4: proporción 0.10 < 0.5».
+- `opened_at` y `closed_at` son el `t_capture_utc` del último cuadro de la ventana en que se abrió o se cerró, que es cuando la condición se pudo evaluar.
+- Los eventos que explican una alerta (`event_ids`) son los cuadros en zona baja de las ventanas donde se cumplió la condición; `window_ids` son esas ventanas. Para B, al abrirse incluye las 3 ventanas de la racha.
+- Si la corrida termina con una alerta abierta (por ejemplo, porque la última ventana es parcial e insuficiente), queda `abierta`: no se cierra sin evidencia.
+
+**Implementación:** [`src/p6/alertas.py`](../src/p6/alertas.py) (`EvaluadorReglas`). `monitorear` la llama al cerrar cada ventana, guarda las alertas que cambian y, si una alerta se abrió en esa ventana, conserva la captura de todos sus cuadros ([`capturas.md`](capturas.md)). Las pruebas con secuencias sintéticas están en `tests/test_alertas.py`: A se dispara con ≥ 0.50, B necesita 3 ventanas seguidas con > 0.2204, las ventanas insuficientes no cuentan, un episodio es una sola alerta y la referencia real no dispara ninguna.
 
 **Por qué estos valores, con la referencia:**
 

@@ -26,7 +26,7 @@ Cada corrida guarda sus eventos en la base de datos `resultados/monitoreo.db` y 
 - `eventos.jsonl` y `alertas.jsonl`, exportados desde la base de datos.
 - `capturas/`: los JPEG conservados según la política de capturas.
 
-Para consultar los eventos en el portal:
+Para consultar los eventos y las alertas en el portal (`/eventos`, `/alertas`, `/corridas`):
 
 ```bash
 python -m p6.portal --db resultados/monitoreo.db      # http://127.0.0.1:8000

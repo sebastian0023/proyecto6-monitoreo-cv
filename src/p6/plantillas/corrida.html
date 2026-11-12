@@ -48,6 +48,28 @@
 </div>
 {% endif %}
 
+<h2>Alertas ({{ alertas|length }})</h2>
+{% if alertas %}
+<div class="tabla-scroll">
+<table>
+  <thead><tr><th>Alerta</th><th>Regla</th><th>Severidad</th><th>Estado</th><th class="num">Abrió en</th><th class="num">Cerró en</th><th>Motivo</th></tr></thead>
+  <tbody>
+  {% for a in alertas %}
+    <tr>
+      <td class="mono"><a href="/alertas/{{ a.alert_id }}">{{ a.alert_id }}</a></td>
+      <td>{{ a.rule_id }}</td><td>{{ m.severidad(a.severity) }}</td><td>{{ m.estado_alerta(a.status) }}</td>
+      <td class="num">ventana {{ a.opened_window_id }}</td>
+      <td class="num">{{ 'ventana %s'|format(a.closed_window_id) if a.closed_window_id else '—' }}</td>
+      <td>{{ a.reason }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% else %}
+<div class="aviso">Esta corrida no abrió alertas: ninguna ventana suficiente cumplió la regla A ni hubo una racha para la regla B.</div>
+{% endif %}
+
 <h2>run.json</h2>
 <details><summary>Ver completo</summary><pre>{{ run|tojson(indent=2) }}</pre></details>
 {% endblock %}

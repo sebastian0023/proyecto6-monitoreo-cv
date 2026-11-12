@@ -11,8 +11,12 @@ Páginas:
   enlaces a la configuración y a la corrida.
 - `/capturas/{event_id}`: el JPEG, solo si existe y su SHA-256 coincide con el del evento.
 - `/configuracion/{sha256}`: el texto de la configuración, con su SHA-256 comprobado.
-- `/corridas` y `/corridas/{run_id}`: corridas, su `run.json` y el resumen por ventana.
-- `/api/eventos` y `/api/eventos/{event_id}`: lo mismo en JSON.
+- `/alertas`: lista con filtros por corrida, estado y regla (momento, motivo, severidad).
+- `/alertas/{alert_id}`: regla, ventanas y los eventos que la explican, con sus capturas.
+- `/corridas` y `/corridas/{run_id}`: corridas, su `run.json`, el resumen por ventana y sus
+  alertas.
+- `/api/eventos`, `/api/eventos/{event_id}`, `/api/alertas` y `/api/alertas/{alert_id}`: lo
+  mismo en JSON.
 """
 
 from __future__ import annotations
@@ -24,6 +28,7 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlencode
 
+import yaml
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
@@ -31,7 +36,7 @@ from PIL import Image
 
 from p6 import capturas
 from p6.almacen import Almacen, AlmacenError
-from p6.contrato import ESTADOS, ZONAS
+from p6.contrato import ESTADOS, ESTADOS_ALERTA, ZONAS
 
 POR_PAGINA = 50
 PLANTILLAS = Path(__file__).resolve().parent / "plantillas"
@@ -258,9 +263,109 @@ def crear_app(ruta_db: Path | str) -> FastAPI:
     def detalle_corrida(request: Request, run_id: str):
         with abrir() as db:
             corrida = db.corrida(run_id)
+            alertas = db.alertas(run_id=run_id)
         if corrida is None:
             raise HTTPException(404, f"no existe la corrida {run_id}")
-        return render(request, "corrida.html", {"c": corrida, "run": corrida["run"]})
+        return render(
+            request, "corrida.html", {"c": corrida, "run": corrida["run"], "alertas": alertas}
+        )
+
+    def _filtros_alertas(
+        run_id: str | None, status: str | None, regla: str | None
+    ) -> dict[str, str | None]:
+        f = {
+            "run_id": _texto_o_none(run_id),
+            "status": _texto_o_none(status),
+            "rule_id": _texto_o_none(regla),
+        }
+        if f["status"] is not None and f["status"] not in ESTADOS_ALERTA:
+            raise HTTPException(
+                400, f"estado de alerta desconocido {status!r}; usa {ESTADOS_ALERTA}"
+            )
+        if f["rule_id"] is not None and f["rule_id"] not in ("A", "B"):
+            raise HTTPException(400, f"regla desconocida {regla!r}; usa A o B")
+        return f
+
+    def _reglas(db: Almacen, run_id: str) -> dict[str, dict[str, Any]]:
+        """Definición de las reglas tal como estaba en la configuración de la corrida."""
+        corrida = db.corrida(run_id)
+        if corrida is None:
+            return {}
+        return (yaml.safe_load(corrida["config_texto"]) or {}).get("alertas", {})
+
+    @app.get("/alertas", response_class=HTMLResponse)
+    def lista_alertas(
+        request: Request,
+        run_id: str | None = None,
+        status: str | None = None,
+        regla: str | None = None,
+    ):
+        filtros = _filtros_alertas(run_id, status, regla)
+        with abrir() as db:
+            alertas = db.alertas(**filtros)
+            corridas = db.corridas()
+            reglas = {c["run_id"]: _reglas(db, c["run_id"]) for c in corridas}
+        return render(
+            request,
+            "alertas.html",
+            {
+                "alertas": alertas,
+                "corridas": corridas,
+                "filtros": filtros,
+                "reglas": reglas,
+                "estados": ESTADOS_ALERTA,
+            },
+        )
+
+    @app.get("/alertas/{alert_id}", response_class=HTMLResponse)
+    def detalle_alerta(request: Request, alert_id: str):
+        with abrir() as db:
+            alerta = db.alerta(alert_id)
+            if alerta is None:
+                raise HTTPException(404, f"no existe la alerta {alert_id}")
+            regla = _reglas(db, alerta["run_id"]).get(alerta["rule_id"], {})
+            corrida = db.corrida(alerta["run_id"])
+            carpeta = carpeta_de(db, alerta["run_id"])
+            eventos = []
+            for event_id in alerta["event_ids"]:
+                e = db.evento(event_id)
+                if e is None:  # un evento referido que no está: se muestra como faltante
+                    eventos.append({"event_id": event_id, "_falta": True})
+                    continue
+                e["_captura"] = capturas.verificar(carpeta, e["image_ref"], e["image_sha256"])
+                eventos.append(e)
+        ventanas = {
+            v["window_id"]: v
+            for v in ((corrida or {}).get("run", {}).get("totales") or {}).get("ventanas", [])
+        }
+        return render(
+            request,
+            "alerta.html",
+            {
+                "a": alerta,
+                "regla": regla,
+                "eventos": eventos,
+                "ventanas": [ventanas.get(w, {"window_id": w}) for w in alerta["window_ids"]],
+                "politica": ((corrida or {}).get("run") or {}).get("politica", {}),
+            },
+        )
+
+    @app.get("/api/alertas")
+    def api_alertas(
+        run_id: str | None = None, status: str | None = None, regla: str | None = None
+    ) -> JSONResponse:
+        filtros = _filtros_alertas(run_id, status, regla)
+        with abrir() as db:
+            alertas = db.alertas(**filtros)
+        return JSONResponse({"total": len(alertas), "alertas": alertas})
+
+    @app.get("/api/alertas/{alert_id}")
+    def api_alerta(alert_id: str) -> JSONResponse:
+        with abrir() as db:
+            alerta = db.alerta(alert_id)
+        if alerta is None:
+            raise HTTPException(404, f"no existe la alerta {alert_id}")
+        return JSONResponse({"alerta": alerta})
 
     @app.get("/api/eventos")
     def api_eventos(

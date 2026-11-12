@@ -34,11 +34,14 @@
   td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
   .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; word-break: break-all; }
   .tabla-scroll { overflow-x: auto; }
+  .nowrap, .nowrap .mono { white-space: nowrap; word-break: normal; }
   .etq { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 12px; font-weight: 600; white-space: nowrap; }
   .z-aceptada, .s-ok, .c-ok { background: var(--ok-f); color: var(--ok); }
   .z-duda { background: var(--duda-f); color: var(--duda); }
   .z-baja, .s-error, .c-rota { background: var(--baja-f); color: var(--baja); }
-  .z-ninguna, .s-sin_detecciones, .c-sin { background: var(--gris-f); color: var(--gris); }
+  .z-ninguna, .s-sin_detecciones, .c-sin, .sev-info, .a-cerrada { background: var(--gris-f); color: var(--gris); }
+  .sev-warning { background: var(--duda-f); color: var(--duda); }
+  .sev-critical, .a-abierta { background: var(--baja-f); color: var(--baja); }
   .aviso { border-left: 4px solid var(--gris); background: var(--gris-f); padding: 10px 14px; border-radius: 4px; margin: 8px 0; }
   .aviso.error { border-color: var(--baja); background: var(--baja-f); }
   .aviso.ok { border-color: var(--ok); background: var(--ok-f); }
@@ -64,6 +67,7 @@
   <span class="marca">Monitoreo CV · Proyecto 6</span>
   <nav>
     <a href="/eventos" class="{{ 'activo' if request.url.path.startswith('/eventos') else '' }}">Eventos</a>
+    <a href="/alertas" class="{{ 'activo' if request.url.path.startswith('/alertas') else '' }}">Alertas</a>
     <a href="/corridas" class="{{ 'activo' if request.url.path.startswith('/corridas') else '' }}">Corridas</a>
   </nav>
 </div></header>

@@ -68,11 +68,13 @@ Solo lee: abre la base en modo de solo lectura y no modifica archivos.
 | `/capturas/{event_id}` | El JPEG, solo si existe y su SHA-256 coincide |
 | `/configuracion/{sha256}` | El texto completo de la configuración que produjo los eventos, con su SHA-256 recalculado y comprobado, y las corridas que la usaron |
 | `/corridas`, `/corridas/{run_id}` | Corridas con su fuente, modelo y configuración; por corrida, el conteo por zona, las capturas, el resumen por ventana con enlaces y el `run.json` completo |
-| `/api/eventos`, `/api/eventos/{event_id}` | Lo mismo en JSON, con el estado de la captura |
+| `/alertas` | Alertas con filtros por corrida, estado y regla: regla, severidad, estado, momento y ventana de apertura y de cierre, motivo con los valores medidos y número de eventos |
+| `/alertas/{alert_id}` | La alerta completa: condición de la regla con sus límites, acción sugerida, enlace a la configuración, sus ventanas (con enlace a todos sus cuadros) y los eventos que la explican, cada uno con enlace y miniatura de su captura |
+| `/api/eventos`, `/api/eventos/{event_id}`, `/api/alertas`, `/api/alertas/{alert_id}` | Lo mismo en JSON (los eventos, con el estado de su captura) |
 
 Recorrido de un evento a su imagen y su configuración: `/eventos` → clic en un `event_id` → la imagen está en la sección «Captura» (con su SHA-256 verificado) y la configuración en «Trazabilidad → Configuración».
 
-Las alertas (`/alertas`) se agregan en #7.
+Recorrido de una alerta a los cuadros que la causaron: `/alertas` → clic en un `alert_id` → «Eventos que la explican» lista cada cuadro con su miniatura; cada uno abre su detalle. El detalle de un evento enlaza de vuelta a las alertas que lo incluyen.
 
 ## 4. Pruebas
 

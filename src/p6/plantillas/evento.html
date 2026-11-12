@@ -21,7 +21,7 @@
 
 {% if alertas %}
 <h2>Alertas que incluyen este evento</h2>
-<ul>{% for a in alertas %}<li class="mono">{{ a.alert_id }} · regla {{ a.rule_id }} · {{ a.severity }} · {{ a.status }}</li>{% endfor %}</ul>
+<ul>{% for a in alertas %}<li><a class="mono" href="/alertas/{{ a.alert_id }}">{{ a.alert_id }}</a> · regla {{ a.rule_id }} · {{ m.severidad(a.severity) }} · {{ m.estado_alerta(a.status) }}</li>{% endfor %}</ul>
 {% endif %}
 
 <h2>Captura</h2>

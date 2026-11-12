@@ -13,6 +13,14 @@
 {%- endif -%}
 {%- endmacro %}
 
+{% macro severidad(s) -%}
+<span class="etq sev-{{ s }}">{{ s }}</span>
+{%- endmacro %}
+
+{% macro estado_alerta(s) -%}
+<span class="etq a-{{ s }}">{{ s }}</span>
+{%- endmacro %}
+
 {% macro score(s) -%}
 {{ '%.4f'|format(s) if s is not none else '—' }}
 {%- endmacro %}
