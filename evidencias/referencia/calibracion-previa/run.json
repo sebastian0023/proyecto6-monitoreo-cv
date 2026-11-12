@@ -1,0 +1,69 @@
+{
+  "run_id": "ref-00",
+  "inicio_utc": "2026-11-12T06:39:59+00:00",
+  "fin_utc": "2026-11-12T06:40:29+00:00",
+  "fuente": {
+    "source_id": "video:referencia.mp4",
+    "source_kind": "video",
+    "ruta": "datos/videos/referencia.mp4",
+    "ritmo_declarado_cuadros_s": 5.0,
+    "sin_pausa": false,
+    "muestreo": {
+      "metodo": "1 de cada k cuadros del video",
+      "k": 3,
+      "fps_video": 15.0,
+      "cuadros_video": 439,
+      "ritmo_equivalente_cuadros_s": 5.0
+    }
+  },
+  "modelo": {
+    "nombre": "yolox_nano",
+    "version": "0.1.1rc0",
+    "sha256": "c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d",
+    "tarea": "detection",
+    "archivo": "/Users/danielsebastianmaciasmacias/Documents/proyecto6-monitoreo-cv/config/../modelo/yolox_nano.onnx",
+    "descriptor": "/Users/danielsebastianmaciasmacias/Documents/proyecto6-monitoreo-cv/config/../modelo/descriptor.yaml",
+    "piso_puntuacion": 0.1
+  },
+  "configuracion": {
+    "archivo": "config/monitoreo.yaml",
+    "sha256": "515cbb0a002d003f3d59075fcc5dd8e3dd72f849476529672a4d9ee6d79fe863"
+  },
+  "entorno": {
+    "so": "macOS-26.6.2-arm64-arm-64bit",
+    "python": "3.12.13",
+    "onnxruntime": "1.30.0",
+    "opencv": "5.0.0",
+    "numpy": "2.5.4",
+    "git_commit": "8414427faee06e25a17514c041beeee624e73354",
+    "git_arbol_con_cambios": true
+  },
+  "cuadros_warmup": 5,
+  "contrato": {
+    "documento": "docs/contrato.md",
+    "etapa": "H1"
+  },
+  "archivos": {
+    "eventos": "eventos.jsonl"
+  },
+  "totales": {
+    "cuadros": 147,
+    "ok": 147,
+    "sin_detecciones": 0,
+    "error": 0,
+    "interrumpida": false,
+    "eventos_aceptados": 147,
+    "eventos_rechazados": 0,
+    "motivos_rechazo": {},
+    "frame_score": {
+      "n": 147,
+      "min": 0.8333,
+      "p10": 0.8657,
+      "p50": 0.8956,
+      "p90": 0.9249,
+      "max": 0.9507
+    },
+    "duracion_s": 29.271,
+    "cuadros_por_s_medido": 5.022
+  }
+}

@@ -1,0 +1,53 @@
+# Configuración del monitoreo. CONGELADA: los umbrales y las reglas se eligieron solo con
+# `referencia.mp4` (ver docs/politica.md y evidencias/referencia/). Los videos de C1 y C2 no
+# se usaron para ajustarla, y las tres corridas comparten el mismo `config_sha256`. Cambiar
+# cualquier valor obliga a repetir la referencia y los dos escenarios.
+#
+# Su SHA-256 completo se guarda en run.json, en cada evento y en cada alerta
+# (`config_sha256`). Rutas relativas a este archivo.
+version: 1
+
+modelo:
+  archivo: ../modelo/yolox_nano.onnx        # se descarga con scripts/descargar_modelo.py
+  descriptor: ../modelo/descriptor.yaml     # versión, SHA-256 esperado y clases
+
+fuente:
+  ritmo_cuadros_s: 5      # cuadros por segundo que se entregan al detector
+  cuadros_warmup: 5       # primeros cuadros de la corrida; se excluyen de las métricas de tiempo
+
+detector:
+  tamano_entrada: 416     # lado del tensor cuadrado de YOLOX-Nano
+  relleno: 114            # gris del letterbox, como en el entrenamiento de YOLOX
+  piso: 0.10              # puntuación mínima que entrega el detector (P5 usaba 0.30)
+  nms_iou: 0.45           # NMS por clase; valor por defecto de YOLOX
+  max_detecciones: 100    # tope por cuadro después del NMS
+
+# Política de confianza. frame_score = puntuación más alta del cuadro.
+#   aceptada: s >= umbral_superior | duda: umbral_inferior <= s < umbral_superior | baja: s < umbral_inferior
+# Se exige detector.piso < umbral_inferior < umbral_superior <= 1.
+confianza:
+  umbral_inferior: 0.85   # percentil 10 de la referencia (0.8657), al múltiplo de 0.05 más cercano
+  umbral_superior: 0.90   # percentil 50 de la referencia (0.8956), al múltiplo de 0.05 más cercano
+  ventana_cuadros: 20     # cuadros procesados consecutivos, sin solapamiento (4 s a 5 cuadros/s)
+  minimo_con_detecciones: 10   # una ventana con menos cuadros con detecciones es "insuficiente"
+
+# Referencia: la corrida sobre referencia.mp4 con la que se eligieron los valores de arriba.
+referencia:
+  run_id: ref-01
+  video: ../datos/videos/referencia.mp4
+  video_sha256: ac2d62846cc0d020d753ae48b50d6c0972ec9df5b32c5f0c3cb1cc14db2c0d84
+  p_ref: 0.0204           # cuadros en zona baja / cuadros con detecciones de la referencia (3 de 147)
+
+# Reglas de alerta (se evalúan por ventana; ver docs/politica.md).
+alertas:
+  A:
+    nombre: baja_confianza
+    proporcion_minima: 0.50     # en una ventana suficiente, proporción baja >= 0.50
+    severidad: warning
+    accion_sugerida: Revisar la captura, la iluminación y el enfoque
+  B:
+    nombre: cambio_sostenido
+    margen_sobre_referencia: 0.20   # proporción baja > p_ref + 0.20 ...
+    ventanas_seguidas: 3            # ... en 3 ventanas suficientes seguidas
+    severidad: critical
+    accion_sugerida: Investigar un cambio de escena o de cámara; comparar con la referencia

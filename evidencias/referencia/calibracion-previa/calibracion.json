@@ -1,0 +1,27 @@
+{
+  "cuadros": 147,
+  "con_detecciones": 147,
+  "sin_detecciones": 0,
+  "error": 0,
+  "frame_score": {
+    "min": 0.833298,
+    "max": 0.95073,
+    "p1": 0.843284,
+    "p5": 0.859902,
+    "p10": 0.865718,
+    "p25": 0.881256,
+    "p50": 0.895552,
+    "p75": 0.905883,
+    "p90": 0.924931,
+    "p95": 0.931226,
+    "p99": 0.938147
+  },
+  "propuesta": {
+    "umbral_inferior": 0.85,
+    "umbral_superior": 0.9,
+    "regla": "inferior = percentil 10 y superior = percentil 50 de frame_score, al múltiplo de 0.05 más cercano"
+  },
+  "piso_detector": 0.1,
+  "restriccion": "piso < inferior < superior <= 1",
+  "restriccion_cumple": true
+}

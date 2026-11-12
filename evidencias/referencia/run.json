@@ -1,0 +1,205 @@
+{
+  "run_id": "ref-01",
+  "inicio_utc": "2026-11-12T06:43:26+00:00",
+  "fin_utc": "2026-11-12T06:43:55+00:00",
+  "fuente": {
+    "source_id": "video:referencia.mp4",
+    "source_kind": "video",
+    "ruta": "datos/videos/referencia.mp4",
+    "ritmo_declarado_cuadros_s": 5.0,
+    "sin_pausa": false,
+    "muestreo": {
+      "metodo": "1 de cada k cuadros del video",
+      "k": 3,
+      "fps_video": 15.0,
+      "cuadros_video": 439,
+      "ritmo_equivalente_cuadros_s": 5.0
+    }
+  },
+  "modelo": {
+    "nombre": "yolox_nano",
+    "version": "0.1.1rc0",
+    "sha256": "c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d",
+    "tarea": "detection",
+    "archivo": "/Users/danielsebastianmaciasmacias/Documents/proyecto6-monitoreo-cv/config/../modelo/yolox_nano.onnx",
+    "descriptor": "/Users/danielsebastianmaciasmacias/Documents/proyecto6-monitoreo-cv/config/../modelo/descriptor.yaml",
+    "piso_puntuacion": 0.1
+  },
+  "configuracion": {
+    "archivo": "config/monitoreo.yaml",
+    "sha256": "11b0625330078e09f04f6d8c45efe9e09997a28d34afbaf07a75978e4b500a3f"
+  },
+  "entorno": {
+    "so": "macOS-26.6.2-arm64-arm-64bit",
+    "python": "3.12.13",
+    "onnxruntime": "1.30.0",
+    "opencv": "5.0.0",
+    "numpy": "2.5.4",
+    "git_commit": "ff2fcb9efb887041b05b61fd473e980c7b58befb",
+    "git_arbol_con_cambios": false
+  },
+  "cuadros_warmup": 5,
+  "contrato": {
+    "documento": "docs/contrato.md",
+    "etapa": "H3"
+  },
+  "politica": {
+    "documento": "docs/politica.md",
+    "umbral_inferior": 0.85,
+    "umbral_superior": 0.9,
+    "ventana_cuadros": 20,
+    "minimo_con_detecciones": 10,
+    "referencia_run_id": "ref-01",
+    "p_ref": 0.0204
+  },
+  "archivos": {
+    "eventos": "eventos.jsonl"
+  },
+  "totales": {
+    "cuadros": 147,
+    "ok": 147,
+    "sin_detecciones": 0,
+    "error": 0,
+    "interrumpida": false,
+    "eventos_aceptados": 147,
+    "eventos_rechazados": 0,
+    "motivos_rechazo": {},
+    "frame_score": {
+      "n": 147,
+      "min": 0.8333,
+      "p10": 0.8657,
+      "p50": 0.8956,
+      "p90": 0.9249,
+      "max": 0.9507
+    },
+    "zonas": {
+      "aceptada": 51,
+      "duda": 93,
+      "baja": 3
+    },
+    "ventanas": [
+      {
+        "window_id": 1,
+        "cuadros": 20,
+        "completa": true,
+        "con_detecciones": 20,
+        "sin_detecciones": 0,
+        "error": 0,
+        "aceptada": 1,
+        "duda": 17,
+        "baja": 2,
+        "suficiente": true,
+        "proporcion_baja": 0.1,
+        "event_id_desde": "ref-01-1",
+        "event_id_hasta": "ref-01-20"
+      },
+      {
+        "window_id": 2,
+        "cuadros": 20,
+        "completa": true,
+        "con_detecciones": 20,
+        "sin_detecciones": 0,
+        "error": 0,
+        "aceptada": 15,
+        "duda": 4,
+        "baja": 1,
+        "suficiente": true,
+        "proporcion_baja": 0.05,
+        "event_id_desde": "ref-01-21",
+        "event_id_hasta": "ref-01-40"
+      },
+      {
+        "window_id": 3,
+        "cuadros": 20,
+        "completa": true,
+        "con_detecciones": 20,
+        "sin_detecciones": 0,
+        "error": 0,
+        "aceptada": 8,
+        "duda": 12,
+        "baja": 0,
+        "suficiente": true,
+        "proporcion_baja": 0.0,
+        "event_id_desde": "ref-01-41",
+        "event_id_hasta": "ref-01-60"
+      },
+      {
+        "window_id": 4,
+        "cuadros": 20,
+        "completa": true,
+        "con_detecciones": 20,
+        "sin_detecciones": 0,
+        "error": 0,
+        "aceptada": 6,
+        "duda": 14,
+        "baja": 0,
+        "suficiente": true,
+        "proporcion_baja": 0.0,
+        "event_id_desde": "ref-01-61",
+        "event_id_hasta": "ref-01-80"
+      },
+      {
+        "window_id": 5,
+        "cuadros": 20,
+        "completa": true,
+        "con_detecciones": 20,
+        "sin_detecciones": 0,
+        "error": 0,
+        "aceptada": 8,
+        "duda": 12,
+        "baja": 0,
+        "suficiente": true,
+        "proporcion_baja": 0.0,
+        "event_id_desde": "ref-01-81",
+        "event_id_hasta": "ref-01-100"
+      },
+      {
+        "window_id": 6,
+        "cuadros": 20,
+        "completa": true,
+        "con_detecciones": 20,
+        "sin_detecciones": 0,
+        "error": 0,
+        "aceptada": 7,
+        "duda": 13,
+        "baja": 0,
+        "suficiente": true,
+        "proporcion_baja": 0.0,
+        "event_id_desde": "ref-01-101",
+        "event_id_hasta": "ref-01-120"
+      },
+      {
+        "window_id": 7,
+        "cuadros": 20,
+        "completa": true,
+        "con_detecciones": 20,
+        "sin_detecciones": 0,
+        "error": 0,
+        "aceptada": 6,
+        "duda": 14,
+        "baja": 0,
+        "suficiente": true,
+        "proporcion_baja": 0.0,
+        "event_id_desde": "ref-01-121",
+        "event_id_hasta": "ref-01-140"
+      },
+      {
+        "window_id": 8,
+        "cuadros": 7,
+        "completa": false,
+        "con_detecciones": 7,
+        "sin_detecciones": 0,
+        "error": 0,
+        "aceptada": 0,
+        "duda": 7,
+        "baja": 0,
+        "suficiente": false,
+        "proporcion_baja": "insuficiente",
+        "event_id_desde": "ref-01-141",
+        "event_id_hasta": "ref-01-147"
+      }
+    ],
+    "duracion_s": 29.265,
+    "cuadros_por_s_medido": 5.023
+  }
+}
