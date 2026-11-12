@@ -1,0 +1,16 @@
+recálculo de las métricas de c1-normal desde evidencias/escenarios/monitoreo.db (guardadas el 2026-11-12T07:16:14+00:00)
+G1 latencia de inferencia: p50 18.626 ms, p95 22.274 ms (n=142)
+G2 cuadros procesados por segundo: 4.998 (n=147)
+G3 RAM del proceso: máximo 182.08 MiB, último 158.67 MiB
+G4 proporción de baja confianza: 0.0 (0 de 147 con detecciones)
+G5 cobertura de trazabilidad: 1.0 (147 de 147)
+G6 coincidencia de versión del modelo: 1.0 (147 de 147; 1 versión(es))
+G7 alertas activas por ventana: [0, 0, 0, 0, 0, 0, 0, 0] (máximo 0, abiertas al final 0)
+G1: coincide (corrida y 8 ventanas)
+G2: coincide (corrida y 8 ventanas)
+G3: coincide (corrida y 8 ventanas)
+G4: coincide (corrida y 8 ventanas)
+G5: coincide (corrida y 8 ventanas)
+G6: coincide (corrida y 8 ventanas)
+G7: coincide (corrida y 8 ventanas)
+resultado: todo coincide

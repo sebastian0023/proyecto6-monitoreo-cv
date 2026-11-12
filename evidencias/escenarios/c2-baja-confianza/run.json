@@ -1,0 +1,254 @@
+{
+  "run_id": "c2-baja-confianza",
+  "inicio_utc": "2026-11-12T07:16:14+00:00",
+  "fin_utc": "2026-11-12T07:16:43+00:00",
+  "fuente": {
+    "source_id": "video:baja_confianza.mp4",
+    "source_kind": "video",
+    "ruta": "datos/videos/baja_confianza.mp4",
+    "ritmo_declarado_cuadros_s": 5.0,
+    "sin_pausa": false,
+    "muestreo": {
+      "metodo": "1 de cada k cuadros del video",
+      "k": 3,
+      "fps_video": 15.0,
+      "cuadros_video": 440,
+      "ritmo_equivalente_cuadros_s": 5.0
+    }
+  },
+  "modelo": {
+    "nombre": "yolox_nano",
+    "version": "0.1.1rc0",
+    "sha256": "c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d",
+    "tarea": "detection",
+    "archivo": "/Users/danielsebastianmaciasmacias/Documents/proyecto6-monitoreo-cv/config/../modelo/yolox_nano.onnx",
+    "descriptor": "/Users/danielsebastianmaciasmacias/Documents/proyecto6-monitoreo-cv/config/../modelo/descriptor.yaml",
+    "piso_puntuacion": 0.1
+  },
+  "configuracion": {
+    "archivo": "config/monitoreo.yaml",
+    "sha256": "11b0625330078e09f04f6d8c45efe9e09997a28d34afbaf07a75978e4b500a3f"
+  },
+  "entorno": {
+    "so": "macOS-26.6.2-arm64-arm-64bit",
+    "python": "3.12.13",
+    "onnxruntime": "1.30.0",
+    "opencv": "5.0.0",
+    "numpy": "2.5.4",
+    "git_commit": "9a4ba475de4532be2174ed155869be94d0ced684",
+    "git_arbol_con_cambios": false
+  },
+  "cuadros_warmup": 5,
+  "contrato": {
+    "documento": "docs/contrato.md",
+    "etapa": "H4"
+  },
+  "politica": {
+    "documento": "docs/politica.md",
+    "umbral_inferior": 0.85,
+    "umbral_superior": 0.9,
+    "ventana_cuadros": 20,
+    "minimo_con_detecciones": 10,
+    "referencia_run_id": "ref-01",
+    "p_ref": 0.0204,
+    "regla_A": {
+      "condicion": "proporción baja >= proporcion_minima en una ventana suficiente",
+      "proporcion_minima": 0.5,
+      "severidad": "warning"
+    },
+    "regla_B": {
+      "condicion": "proporción baja > p_ref + margen en N ventanas suficientes seguidas",
+      "limite": 0.2204,
+      "ventanas_seguidas": 3,
+      "severidad": "critical"
+    }
+  },
+  "politica_capturas": {
+    "documento": "docs/capturas.md",
+    "motivos": {
+      "baja": "todo cuadro en zona baja",
+      "ventana_alerta": "todos los cuadros de una ventana que abrió una alerta",
+      "muestra": "1 de cada 20 cuadros (frame_id % 20 == 1)"
+    },
+    "formato": "JPEG calidad 90",
+    "carpeta": "capturas/<event_id>.jpg",
+    "caducidad": "ninguna"
+  },
+  "archivos": {
+    "eventos": "eventos.jsonl",
+    "alertas": "alertas.jsonl",
+    "capturas": "capturas/",
+    "base_de_datos": "../monitoreo.db",
+    "metricas": "metricas.json"
+  },
+  "totales": {
+    "cuadros": 147,
+    "ok": 147,
+    "sin_detecciones": 0,
+    "error": 0,
+    "interrumpida": false,
+    "eventos_aceptados": 147,
+    "eventos_rechazados": 0,
+    "motivos_rechazo": {},
+    "frame_score": {
+      "n": 147,
+      "min": 0.4284,
+      "p10": 0.7723,
+      "p50": 0.8061,
+      "p90": 0.8649,
+      "max": 0.8985
+    },
+    "zonas": {
+      "aceptada": 0,
+      "duda": 19,
+      "baja": 128
+    },
+    "capturas": {
+      "baja": 128,
+      "ventana_alerta": 10,
+      "muestra": 1,
+      "total": 139
+    },
+    "alertas": 2,
+    "alertas_detalle": {
+      "c2-baja-confianza-A-1": {
+        "rule_id": "A",
+        "severity": "warning",
+        "status": "abierta",
+        "opened_window_id": 1,
+        "closed_window_id": null
+      },
+      "c2-baja-confianza-B-1": {
+        "rule_id": "B",
+        "severity": "critical",
+        "status": "abierta",
+        "opened_window_id": 3,
+        "closed_window_id": null
+      }
+    },
+    "ventanas": [
+      {
+        "window_id": 1,
+        "cuadros": 20,
+        "completa": true,
+        "con_detecciones": 20,
+        "sin_detecciones": 0,
+        "error": 0,
+        "aceptada": 0,
+        "duda": 6,
+        "baja": 14,
+        "suficiente": true,
+        "proporcion_baja": 0.7,
+        "event_id_desde": "c2-baja-confianza-1",
+        "event_id_hasta": "c2-baja-confianza-20"
+      },
+      {
+        "window_id": 2,
+        "cuadros": 20,
+        "completa": true,
+        "con_detecciones": 20,
+        "sin_detecciones": 0,
+        "error": 0,
+        "aceptada": 0,
+        "duda": 3,
+        "baja": 17,
+        "suficiente": true,
+        "proporcion_baja": 0.85,
+        "event_id_desde": "c2-baja-confianza-21",
+        "event_id_hasta": "c2-baja-confianza-40"
+      },
+      {
+        "window_id": 3,
+        "cuadros": 20,
+        "completa": true,
+        "con_detecciones": 20,
+        "sin_detecciones": 0,
+        "error": 0,
+        "aceptada": 0,
+        "duda": 4,
+        "baja": 16,
+        "suficiente": true,
+        "proporcion_baja": 0.8,
+        "event_id_desde": "c2-baja-confianza-41",
+        "event_id_hasta": "c2-baja-confianza-60"
+      },
+      {
+        "window_id": 4,
+        "cuadros": 20,
+        "completa": true,
+        "con_detecciones": 20,
+        "sin_detecciones": 0,
+        "error": 0,
+        "aceptada": 0,
+        "duda": 4,
+        "baja": 16,
+        "suficiente": true,
+        "proporcion_baja": 0.8,
+        "event_id_desde": "c2-baja-confianza-61",
+        "event_id_hasta": "c2-baja-confianza-80"
+      },
+      {
+        "window_id": 5,
+        "cuadros": 20,
+        "completa": true,
+        "con_detecciones": 20,
+        "sin_detecciones": 0,
+        "error": 0,
+        "aceptada": 0,
+        "duda": 0,
+        "baja": 20,
+        "suficiente": true,
+        "proporcion_baja": 1.0,
+        "event_id_desde": "c2-baja-confianza-81",
+        "event_id_hasta": "c2-baja-confianza-100"
+      },
+      {
+        "window_id": 6,
+        "cuadros": 20,
+        "completa": true,
+        "con_detecciones": 20,
+        "sin_detecciones": 0,
+        "error": 0,
+        "aceptada": 0,
+        "duda": 2,
+        "baja": 18,
+        "suficiente": true,
+        "proporcion_baja": 0.9,
+        "event_id_desde": "c2-baja-confianza-101",
+        "event_id_hasta": "c2-baja-confianza-120"
+      },
+      {
+        "window_id": 7,
+        "cuadros": 20,
+        "completa": true,
+        "con_detecciones": 20,
+        "sin_detecciones": 0,
+        "error": 0,
+        "aceptada": 0,
+        "duda": 0,
+        "baja": 20,
+        "suficiente": true,
+        "proporcion_baja": 1.0,
+        "event_id_desde": "c2-baja-confianza-121",
+        "event_id_hasta": "c2-baja-confianza-140"
+      },
+      {
+        "window_id": 8,
+        "cuadros": 7,
+        "completa": false,
+        "con_detecciones": 7,
+        "sin_detecciones": 0,
+        "error": 0,
+        "aceptada": 0,
+        "duda": 0,
+        "baja": 7,
+        "suficiente": false,
+        "proporcion_baja": "insuficiente",
+        "event_id_desde": "c2-baja-confianza-141",
+        "event_id_hasta": "c2-baja-confianza-147"
+      }
+    ],
+    "duracion_s": 29.275,
+    "cuadros_por_s_medido": 5.021
+  }
+}

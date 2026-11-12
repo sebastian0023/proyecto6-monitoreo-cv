@@ -45,4 +45,10 @@ La fuente puede ser un video, una carpeta de imágenes o la webcam (`--fuente we
 - [`docs/capturas.md`](docs/capturas.md): base de datos, política de capturas y portal.
 - [`docs/metricas.md`](docs/metricas.md): las 7 métricas base (G1–G7), con definición, fórmula y ejemplo.
 
+## Evidencias
+
+- [`evidencias/referencia/`](evidencias/referencia/): la corrida de referencia con la que se eligieron los umbrales.
+- [`evidencias/escenarios/`](evidencias/escenarios/): C1 (`c1-normal`) y C2 (`c2-baja-confianza`) con su comando, eventos, alertas, capturas, métricas y pantallas del portal, más la base de datos para consultarlos.
+- [`evidencias/metricas/`](evidencias/metricas/): las métricas G1–G7 de C1 y C2 y su recálculo.
+
 Las instrucciones completas, el índice de evidencias y la autoría se cierran en #10.

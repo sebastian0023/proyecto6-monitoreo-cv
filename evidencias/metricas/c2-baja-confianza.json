@@ -1,0 +1,1109 @@
+{
+  "run_id": "c2-baja-confianza",
+  "documento": "docs/metricas.md",
+  "corrida": {
+    "cuadros": 147,
+    "window_ids": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "event_id_desde": "c2-baja-confianza-1",
+    "event_id_hasta": "c2-baja-confianza-147",
+    "G1": {
+      "metrica": "latencia_inferencia_ms",
+      "estado": "ok",
+      "p50": 18.462,
+      "p95": 22.476,
+      "excluidos": {
+        "warmup": 5,
+        "error": 0
+      },
+      "n": 142,
+      "window_ids": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "event_id_desde": "c2-baja-confianza-6",
+      "event_id_hasta": "c2-baja-confianza-147"
+    },
+    "G2": {
+      "metrica": "cuadros_procesados_por_s",
+      "estado": "ok",
+      "valor": 4.999,
+      "intervalo_s": 29.208,
+      "excluidos": {
+        "error": 0
+      },
+      "n": 147,
+      "window_ids": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "event_id_desde": "c2-baja-confianza-1",
+      "event_id_hasta": "c2-baja-confianza-147"
+    },
+    "G3": {
+      "metrica": "ram_proceso_mib",
+      "estado": "ok",
+      "max": 182.22,
+      "ultimo": 182.03,
+      "event_id_max": "c2-baja-confianza-139",
+      "n": 147,
+      "window_ids": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "event_id_desde": "c2-baja-confianza-1",
+      "event_id_hasta": "c2-baja-confianza-147"
+    },
+    "G4": {
+      "metrica": "proporcion_baja_confianza",
+      "estado": "ok",
+      "valor": 0.8707,
+      "baja": 128,
+      "con_detecciones": 147,
+      "minimo": 10,
+      "excluidos": {
+        "sin_detecciones": 0,
+        "error": 0
+      },
+      "n": 147,
+      "window_ids": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "event_id_desde": "c2-baja-confianza-1",
+      "event_id_hasta": "c2-baja-confianza-147"
+    },
+    "G5": {
+      "metrica": "cobertura_trazabilidad",
+      "estado": "ok",
+      "valor": 1.0,
+      "cumplen": 147,
+      "total": 147,
+      "incumplen": [],
+      "n": 147,
+      "window_ids": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "event_id_desde": "c2-baja-confianza-1",
+      "event_id_hasta": "c2-baja-confianza-147"
+    },
+    "G6": {
+      "metrica": "coincidencia_version_modelo",
+      "estado": "ok",
+      "valor": 1.0,
+      "coinciden": 147,
+      "total": 147,
+      "sha256_esperado": "c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d",
+      "versiones": [
+        {
+          "model_version": "0.1.1rc0",
+          "model_sha256": "c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d",
+          "eventos": 147
+        }
+      ],
+      "n": 147,
+      "window_ids": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "event_id_desde": "c2-baja-confianza-1",
+      "event_id_hasta": "c2-baja-confianza-147"
+    },
+    "G7": {
+      "metrica": "alertas_activas",
+      "estado": "ok",
+      "serie": [
+        1,
+        1,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "max_simultaneas": 2,
+      "abiertas_al_final": 2,
+      "alert_ids": [
+        "c2-baja-confianza-A-1",
+        "c2-baja-confianza-B-1"
+      ],
+      "window_ids": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    }
+  },
+  "ventanas": [
+    {
+      "window_id": 1,
+      "cuadros": 20,
+      "event_id_desde": "c2-baja-confianza-1",
+      "event_id_hasta": "c2-baja-confianza-20",
+      "G1": {
+        "metrica": "latencia_inferencia_ms",
+        "estado": "ok",
+        "p50": 18.587,
+        "p95": 22.024,
+        "excluidos": {
+          "warmup": 5,
+          "error": 0
+        },
+        "n": 15,
+        "window_ids": [
+          1
+        ],
+        "event_id_desde": "c2-baja-confianza-6",
+        "event_id_hasta": "c2-baja-confianza-20"
+      },
+      "G2": {
+        "metrica": "cuadros_procesados_por_s",
+        "estado": "ok",
+        "valor": 4.992,
+        "intervalo_s": 3.806,
+        "excluidos": {
+          "error": 0
+        },
+        "n": 20,
+        "window_ids": [
+          1
+        ],
+        "event_id_desde": "c2-baja-confianza-1",
+        "event_id_hasta": "c2-baja-confianza-20"
+      },
+      "G3": {
+        "metrica": "ram_proceso_mib",
+        "estado": "ok",
+        "max": 167.33,
+        "ultimo": 167.33,
+        "event_id_max": "c2-baja-confianza-20",
+        "n": 20,
+        "window_ids": [
+          1
+        ],
+        "event_id_desde": "c2-baja-confianza-1",
+        "event_id_hasta": "c2-baja-confianza-20"
+      },
+      "G4": {
+        "metrica": "proporcion_baja_confianza",
+        "estado": "ok",
+        "valor": 0.7,
+        "baja": 14,
+        "con_detecciones": 20,
+        "minimo": 10,
+        "excluidos": {
+          "sin_detecciones": 0,
+          "error": 0
+        },
+        "n": 20,
+        "window_ids": [
+          1
+        ],
+        "event_id_desde": "c2-baja-confianza-1",
+        "event_id_hasta": "c2-baja-confianza-20"
+      },
+      "G5": {
+        "metrica": "cobertura_trazabilidad",
+        "estado": "ok",
+        "valor": 1.0,
+        "cumplen": 20,
+        "total": 20,
+        "incumplen": [],
+        "n": 20,
+        "window_ids": [
+          1
+        ],
+        "event_id_desde": "c2-baja-confianza-1",
+        "event_id_hasta": "c2-baja-confianza-20"
+      },
+      "G6": {
+        "metrica": "coincidencia_version_modelo",
+        "estado": "ok",
+        "valor": 1.0,
+        "coinciden": 20,
+        "total": 20,
+        "sha256_esperado": "c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d",
+        "versiones": [
+          {
+            "model_version": "0.1.1rc0",
+            "model_sha256": "c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d",
+            "eventos": 20
+          }
+        ],
+        "n": 20,
+        "window_ids": [
+          1
+        ],
+        "event_id_desde": "c2-baja-confianza-1",
+        "event_id_hasta": "c2-baja-confianza-20"
+      },
+      "G7": {
+        "metrica": "alertas_activas",
+        "estado": "ok",
+        "valor": 1,
+        "alert_ids": [
+          "c2-baja-confianza-A-1"
+        ],
+        "window_ids": [
+          1
+        ]
+      }
+    },
+    {
+      "window_id": 2,
+      "cuadros": 20,
+      "event_id_desde": "c2-baja-confianza-21",
+      "event_id_hasta": "c2-baja-confianza-40",
+      "G1": {
+        "metrica": "latencia_inferencia_ms",
+        "estado": "ok",
+        "p50": 18.349,
+        "p95": 21.445,
+        "excluidos": {
+          "warmup": 0,
+          "error": 0
+        },
+        "n": 20,
+        "window_ids": [
+          2
+        ],
+        "event_id_desde": "c2-baja-confianza-21",
+        "event_id_hasta": "c2-baja-confianza-40"
+      },
+      "G2": {
+        "metrica": "cuadros_procesados_por_s",
+        "estado": "ok",
+        "valor": 4.998,
+        "intervalo_s": 3.801,
+        "excluidos": {
+          "error": 0
+        },
+        "n": 20,
+        "window_ids": [
+          2
+        ],
+        "event_id_desde": "c2-baja-confianza-21",
+        "event_id_hasta": "c2-baja-confianza-40"
+      },
+      "G3": {
+        "metrica": "ram_proceso_mib",
+        "estado": "ok",
+        "max": 170.95,
+        "ultimo": 170.95,
+        "event_id_max": "c2-baja-confianza-37",
+        "n": 20,
+        "window_ids": [
+          2
+        ],
+        "event_id_desde": "c2-baja-confianza-21",
+        "event_id_hasta": "c2-baja-confianza-40"
+      },
+      "G4": {
+        "metrica": "proporcion_baja_confianza",
+        "estado": "ok",
+        "valor": 0.85,
+        "baja": 17,
+        "con_detecciones": 20,
+        "minimo": 10,
+        "excluidos": {
+          "sin_detecciones": 0,
+          "error": 0
+        },
+        "n": 20,
+        "window_ids": [
+          2
+        ],
+        "event_id_desde": "c2-baja-confianza-21",
+        "event_id_hasta": "c2-baja-confianza-40"
+      },
+      "G5": {
+        "metrica": "cobertura_trazabilidad",
+        "estado": "ok",
+        "valor": 1.0,
+        "cumplen": 20,
+        "total": 20,
+        "incumplen": [],
+        "n": 20,
+        "window_ids": [
+          2
+        ],
+        "event_id_desde": "c2-baja-confianza-21",
+        "event_id_hasta": "c2-baja-confianza-40"
+      },
+      "G6": {
+        "metrica": "coincidencia_version_modelo",
+        "estado": "ok",
+        "valor": 1.0,
+        "coinciden": 20,
+        "total": 20,
+        "sha256_esperado": "c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d",
+        "versiones": [
+          {
+            "model_version": "0.1.1rc0",
+            "model_sha256": "c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d",
+            "eventos": 20
+          }
+        ],
+        "n": 20,
+        "window_ids": [
+          2
+        ],
+        "event_id_desde": "c2-baja-confianza-21",
+        "event_id_hasta": "c2-baja-confianza-40"
+      },
+      "G7": {
+        "metrica": "alertas_activas",
+        "estado": "ok",
+        "valor": 1,
+        "alert_ids": [
+          "c2-baja-confianza-A-1"
+        ],
+        "window_ids": [
+          2
+        ]
+      }
+    },
+    {
+      "window_id": 3,
+      "cuadros": 20,
+      "event_id_desde": "c2-baja-confianza-41",
+      "event_id_hasta": "c2-baja-confianza-60",
+      "G1": {
+        "metrica": "latencia_inferencia_ms",
+        "estado": "ok",
+        "p50": 17.919,
+        "p95": 22.337,
+        "excluidos": {
+          "warmup": 0,
+          "error": 0
+        },
+        "n": 20,
+        "window_ids": [
+          3
+        ],
+        "event_id_desde": "c2-baja-confianza-41",
+        "event_id_hasta": "c2-baja-confianza-60"
+      },
+      "G2": {
+        "metrica": "cuadros_procesados_por_s",
+        "estado": "ok",
+        "valor": 5.004,
+        "intervalo_s": 3.797,
+        "excluidos": {
+          "error": 0
+        },
+        "n": 20,
+        "window_ids": [
+          3
+        ],
+        "event_id_desde": "c2-baja-confianza-41",
+        "event_id_hasta": "c2-baja-confianza-60"
+      },
+      "G3": {
+        "metrica": "ram_proceso_mib",
+        "estado": "ok",
+        "max": 180.25,
+        "ultimo": 180.25,
+        "event_id_max": "c2-baja-confianza-59",
+        "n": 20,
+        "window_ids": [
+          3
+        ],
+        "event_id_desde": "c2-baja-confianza-41",
+        "event_id_hasta": "c2-baja-confianza-60"
+      },
+      "G4": {
+        "metrica": "proporcion_baja_confianza",
+        "estado": "ok",
+        "valor": 0.8,
+        "baja": 16,
+        "con_detecciones": 20,
+        "minimo": 10,
+        "excluidos": {
+          "sin_detecciones": 0,
+          "error": 0
+        },
+        "n": 20,
+        "window_ids": [
+          3
+        ],
+        "event_id_desde": "c2-baja-confianza-41",
+        "event_id_hasta": "c2-baja-confianza-60"
+      },
+      "G5": {
+        "metrica": "cobertura_trazabilidad",
+        "estado": "ok",
+        "valor": 1.0,
+        "cumplen": 20,
+        "total": 20,
+        "incumplen": [],
+        "n": 20,
+        "window_ids": [
+          3
+        ],
+        "event_id_desde": "c2-baja-confianza-41",
+        "event_id_hasta": "c2-baja-confianza-60"
+      },
+      "G6": {
+        "metrica": "coincidencia_version_modelo",
+        "estado": "ok",
+        "valor": 1.0,
+        "coinciden": 20,
+        "total": 20,
+        "sha256_esperado": "c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d",
+        "versiones": [
+          {
+            "model_version": "0.1.1rc0",
+            "model_sha256": "c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d",
+            "eventos": 20
+          }
+        ],
+        "n": 20,
+        "window_ids": [
+          3
+        ],
+        "event_id_desde": "c2-baja-confianza-41",
+        "event_id_hasta": "c2-baja-confianza-60"
+      },
+      "G7": {
+        "metrica": "alertas_activas",
+        "estado": "ok",
+        "valor": 2,
+        "alert_ids": [
+          "c2-baja-confianza-A-1",
+          "c2-baja-confianza-B-1"
+        ],
+        "window_ids": [
+          3
+        ]
+      }
+    },
+    {
+      "window_id": 4,
+      "cuadros": 20,
+      "event_id_desde": "c2-baja-confianza-61",
+      "event_id_hasta": "c2-baja-confianza-80",
+      "G1": {
+        "metrica": "latencia_inferencia_ms",
+        "estado": "ok",
+        "p50": 17.358,
+        "p95": 21.484,
+        "excluidos": {
+          "warmup": 0,
+          "error": 0
+        },
+        "n": 20,
+        "window_ids": [
+          4
+        ],
+        "event_id_desde": "c2-baja-confianza-61",
+        "event_id_hasta": "c2-baja-confianza-80"
+      },
+      "G2": {
+        "metrica": "cuadros_procesados_por_s",
+        "estado": "ok",
+        "valor": 5.0,
+        "intervalo_s": 3.8,
+        "excluidos": {
+          "error": 0
+        },
+        "n": 20,
+        "window_ids": [
+          4
+        ],
+        "event_id_desde": "c2-baja-confianza-61",
+        "event_id_hasta": "c2-baja-confianza-80"
+      },
+      "G3": {
+        "metrica": "ram_proceso_mib",
+        "estado": "ok",
+        "max": 180.36,
+        "ultimo": 180.27,
+        "event_id_max": "c2-baja-confianza-67",
+        "n": 20,
+        "window_ids": [
+          4
+        ],
+        "event_id_desde": "c2-baja-confianza-61",
+        "event_id_hasta": "c2-baja-confianza-80"
+      },
+      "G4": {
+        "metrica": "proporcion_baja_confianza",
+        "estado": "ok",
+        "valor": 0.8,
+        "baja": 16,
+        "con_detecciones": 20,
+        "minimo": 10,
+        "excluidos": {
+          "sin_detecciones": 0,
+          "error": 0
+        },
+        "n": 20,
+        "window_ids": [
+          4
+        ],
+        "event_id_desde": "c2-baja-confianza-61",
+        "event_id_hasta": "c2-baja-confianza-80"
+      },
+      "G5": {
+        "metrica": "cobertura_trazabilidad",
+        "estado": "ok",
+        "valor": 1.0,
+        "cumplen": 20,
+        "total": 20,
+        "incumplen": [],
+        "n": 20,
+        "window_ids": [
+          4
+        ],
+        "event_id_desde": "c2-baja-confianza-61",
+        "event_id_hasta": "c2-baja-confianza-80"
+      },
+      "G6": {
+        "metrica": "coincidencia_version_modelo",
+        "estado": "ok",
+        "valor": 1.0,
+        "coinciden": 20,
+        "total": 20,
+        "sha256_esperado": "c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d",
+        "versiones": [
+          {
+            "model_version": "0.1.1rc0",
+            "model_sha256": "c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d",
+            "eventos": 20
+          }
+        ],
+        "n": 20,
+        "window_ids": [
+          4
+        ],
+        "event_id_desde": "c2-baja-confianza-61",
+        "event_id_hasta": "c2-baja-confianza-80"
+      },
+      "G7": {
+        "metrica": "alertas_activas",
+        "estado": "ok",
+        "valor": 2,
+        "alert_ids": [
+          "c2-baja-confianza-A-1",
+          "c2-baja-confianza-B-1"
+        ],
+        "window_ids": [
+          4
+        ]
+      }
+    },
+    {
+      "window_id": 5,
+      "cuadros": 20,
+      "event_id_desde": "c2-baja-confianza-81",
+      "event_id_hasta": "c2-baja-confianza-100",
+      "G1": {
+        "metrica": "latencia_inferencia_ms",
+        "estado": "ok",
+        "p50": 18.462,
+        "p95": 25.022,
+        "excluidos": {
+          "warmup": 0,
+          "error": 0
+        },
+        "n": 20,
+        "window_ids": [
+          5
+        ],
+        "event_id_desde": "c2-baja-confianza-81",
+        "event_id_hasta": "c2-baja-confianza-100"
+      },
+      "G2": {
+        "metrica": "cuadros_procesados_por_s",
+        "estado": "ok",
+        "valor": 4.988,
+        "intervalo_s": 3.809,
+        "excluidos": {
+          "error": 0
+        },
+        "n": 20,
+        "window_ids": [
+          5
+        ],
+        "event_id_desde": "c2-baja-confianza-81",
+        "event_id_hasta": "c2-baja-confianza-100"
+      },
+      "G3": {
+        "metrica": "ram_proceso_mib",
+        "estado": "ok",
+        "max": 180.72,
+        "ultimo": 180.72,
+        "event_id_max": "c2-baja-confianza-94",
+        "n": 20,
+        "window_ids": [
+          5
+        ],
+        "event_id_desde": "c2-baja-confianza-81",
+        "event_id_hasta": "c2-baja-confianza-100"
+      },
+      "G4": {
+        "metrica": "proporcion_baja_confianza",
+        "estado": "ok",
+        "valor": 1.0,
+        "baja": 20,
+        "con_detecciones": 20,
+        "minimo": 10,
+        "excluidos": {
+          "sin_detecciones": 0,
+          "error": 0
+        },
+        "n": 20,
+        "window_ids": [
+          5
+        ],
+        "event_id_desde": "c2-baja-confianza-81",
+        "event_id_hasta": "c2-baja-confianza-100"
+      },
+      "G5": {
+        "metrica": "cobertura_trazabilidad",
+        "estado": "ok",
+        "valor": 1.0,
+        "cumplen": 20,
+        "total": 20,
+        "incumplen": [],
+        "n": 20,
+        "window_ids": [
+          5
+        ],
+        "event_id_desde": "c2-baja-confianza-81",
+        "event_id_hasta": "c2-baja-confianza-100"
+      },
+      "G6": {
+        "metrica": "coincidencia_version_modelo",
+        "estado": "ok",
+        "valor": 1.0,
+        "coinciden": 20,
+        "total": 20,
+        "sha256_esperado": "c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d",
+        "versiones": [
+          {
+            "model_version": "0.1.1rc0",
+            "model_sha256": "c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d",
+            "eventos": 20
+          }
+        ],
+        "n": 20,
+        "window_ids": [
+          5
+        ],
+        "event_id_desde": "c2-baja-confianza-81",
+        "event_id_hasta": "c2-baja-confianza-100"
+      },
+      "G7": {
+        "metrica": "alertas_activas",
+        "estado": "ok",
+        "valor": 2,
+        "alert_ids": [
+          "c2-baja-confianza-A-1",
+          "c2-baja-confianza-B-1"
+        ],
+        "window_ids": [
+          5
+        ]
+      }
+    },
+    {
+      "window_id": 6,
+      "cuadros": 20,
+      "event_id_desde": "c2-baja-confianza-101",
+      "event_id_hasta": "c2-baja-confianza-120",
+      "G1": {
+        "metrica": "latencia_inferencia_ms",
+        "estado": "ok",
+        "p50": 18.477,
+        "p95": 22.759,
+        "excluidos": {
+          "warmup": 0,
+          "error": 0
+        },
+        "n": 20,
+        "window_ids": [
+          6
+        ],
+        "event_id_desde": "c2-baja-confianza-101",
+        "event_id_hasta": "c2-baja-confianza-120"
+      },
+      "G2": {
+        "metrica": "cuadros_procesados_por_s",
+        "estado": "ok",
+        "valor": 5.01,
+        "intervalo_s": 3.792,
+        "excluidos": {
+          "error": 0
+        },
+        "n": 20,
+        "window_ids": [
+          6
+        ],
+        "event_id_desde": "c2-baja-confianza-101",
+        "event_id_hasta": "c2-baja-confianza-120"
+      },
+      "G3": {
+        "metrica": "ram_proceso_mib",
+        "estado": "ok",
+        "max": 181.0,
+        "ultimo": 180.97,
+        "event_id_max": "c2-baja-confianza-114",
+        "n": 20,
+        "window_ids": [
+          6
+        ],
+        "event_id_desde": "c2-baja-confianza-101",
+        "event_id_hasta": "c2-baja-confianza-120"
+      },
+      "G4": {
+        "metrica": "proporcion_baja_confianza",
+        "estado": "ok",
+        "valor": 0.9,
+        "baja": 18,
+        "con_detecciones": 20,
+        "minimo": 10,
+        "excluidos": {
+          "sin_detecciones": 0,
+          "error": 0
+        },
+        "n": 20,
+        "window_ids": [
+          6
+        ],
+        "event_id_desde": "c2-baja-confianza-101",
+        "event_id_hasta": "c2-baja-confianza-120"
+      },
+      "G5": {
+        "metrica": "cobertura_trazabilidad",
+        "estado": "ok",
+        "valor": 1.0,
+        "cumplen": 20,
+        "total": 20,
+        "incumplen": [],
+        "n": 20,
+        "window_ids": [
+          6
+        ],
+        "event_id_desde": "c2-baja-confianza-101",
+        "event_id_hasta": "c2-baja-confianza-120"
+      },
+      "G6": {
+        "metrica": "coincidencia_version_modelo",
+        "estado": "ok",
+        "valor": 1.0,
+        "coinciden": 20,
+        "total": 20,
+        "sha256_esperado": "c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d",
+        "versiones": [
+          {
+            "model_version": "0.1.1rc0",
+            "model_sha256": "c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d",
+            "eventos": 20
+          }
+        ],
+        "n": 20,
+        "window_ids": [
+          6
+        ],
+        "event_id_desde": "c2-baja-confianza-101",
+        "event_id_hasta": "c2-baja-confianza-120"
+      },
+      "G7": {
+        "metrica": "alertas_activas",
+        "estado": "ok",
+        "valor": 2,
+        "alert_ids": [
+          "c2-baja-confianza-A-1",
+          "c2-baja-confianza-B-1"
+        ],
+        "window_ids": [
+          6
+        ]
+      }
+    },
+    {
+      "window_id": 7,
+      "cuadros": 20,
+      "event_id_desde": "c2-baja-confianza-121",
+      "event_id_hasta": "c2-baja-confianza-140",
+      "G1": {
+        "metrica": "latencia_inferencia_ms",
+        "estado": "ok",
+        "p50": 18.625,
+        "p95": 22.476,
+        "excluidos": {
+          "warmup": 0,
+          "error": 0
+        },
+        "n": 20,
+        "window_ids": [
+          7
+        ],
+        "event_id_desde": "c2-baja-confianza-121",
+        "event_id_hasta": "c2-baja-confianza-140"
+      },
+      "G2": {
+        "metrica": "cuadros_procesados_por_s",
+        "estado": "ok",
+        "valor": 5.003,
+        "intervalo_s": 3.798,
+        "excluidos": {
+          "error": 0
+        },
+        "n": 20,
+        "window_ids": [
+          7
+        ],
+        "event_id_desde": "c2-baja-confianza-121",
+        "event_id_hasta": "c2-baja-confianza-140"
+      },
+      "G3": {
+        "metrica": "ram_proceso_mib",
+        "estado": "ok",
+        "max": 182.22,
+        "ultimo": 181.97,
+        "event_id_max": "c2-baja-confianza-139",
+        "n": 20,
+        "window_ids": [
+          7
+        ],
+        "event_id_desde": "c2-baja-confianza-121",
+        "event_id_hasta": "c2-baja-confianza-140"
+      },
+      "G4": {
+        "metrica": "proporcion_baja_confianza",
+        "estado": "ok",
+        "valor": 1.0,
+        "baja": 20,
+        "con_detecciones": 20,
+        "minimo": 10,
+        "excluidos": {
+          "sin_detecciones": 0,
+          "error": 0
+        },
+        "n": 20,
+        "window_ids": [
+          7
+        ],
+        "event_id_desde": "c2-baja-confianza-121",
+        "event_id_hasta": "c2-baja-confianza-140"
+      },
+      "G5": {
+        "metrica": "cobertura_trazabilidad",
+        "estado": "ok",
+        "valor": 1.0,
+        "cumplen": 20,
+        "total": 20,
+        "incumplen": [],
+        "n": 20,
+        "window_ids": [
+          7
+        ],
+        "event_id_desde": "c2-baja-confianza-121",
+        "event_id_hasta": "c2-baja-confianza-140"
+      },
+      "G6": {
+        "metrica": "coincidencia_version_modelo",
+        "estado": "ok",
+        "valor": 1.0,
+        "coinciden": 20,
+        "total": 20,
+        "sha256_esperado": "c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d",
+        "versiones": [
+          {
+            "model_version": "0.1.1rc0",
+            "model_sha256": "c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d",
+            "eventos": 20
+          }
+        ],
+        "n": 20,
+        "window_ids": [
+          7
+        ],
+        "event_id_desde": "c2-baja-confianza-121",
+        "event_id_hasta": "c2-baja-confianza-140"
+      },
+      "G7": {
+        "metrica": "alertas_activas",
+        "estado": "ok",
+        "valor": 2,
+        "alert_ids": [
+          "c2-baja-confianza-A-1",
+          "c2-baja-confianza-B-1"
+        ],
+        "window_ids": [
+          7
+        ]
+      }
+    },
+    {
+      "window_id": 8,
+      "cuadros": 7,
+      "event_id_desde": "c2-baja-confianza-141",
+      "event_id_hasta": "c2-baja-confianza-147",
+      "G1": {
+        "metrica": "latencia_inferencia_ms",
+        "estado": "ok",
+        "p50": 17.405,
+        "p95": 19.521,
+        "excluidos": {
+          "warmup": 0,
+          "error": 0
+        },
+        "n": 7,
+        "window_ids": [
+          8
+        ],
+        "event_id_desde": "c2-baja-confianza-141",
+        "event_id_hasta": "c2-baja-confianza-147"
+      },
+      "G2": {
+        "metrica": "cuadros_procesados_por_s",
+        "estado": "ok",
+        "valor": 4.995,
+        "intervalo_s": 1.201,
+        "excluidos": {
+          "error": 0
+        },
+        "n": 7,
+        "window_ids": [
+          8
+        ],
+        "event_id_desde": "c2-baja-confianza-141",
+        "event_id_hasta": "c2-baja-confianza-147"
+      },
+      "G3": {
+        "metrica": "ram_proceso_mib",
+        "estado": "ok",
+        "max": 182.03,
+        "ultimo": 182.03,
+        "event_id_max": "c2-baja-confianza-142",
+        "n": 7,
+        "window_ids": [
+          8
+        ],
+        "event_id_desde": "c2-baja-confianza-141",
+        "event_id_hasta": "c2-baja-confianza-147"
+      },
+      "G4": {
+        "metrica": "proporcion_baja_confianza",
+        "estado": "insuficiente",
+        "valor": null,
+        "baja": 7,
+        "con_detecciones": 7,
+        "minimo": 10,
+        "excluidos": {
+          "sin_detecciones": 0,
+          "error": 0
+        },
+        "n": 7,
+        "window_ids": [
+          8
+        ],
+        "event_id_desde": "c2-baja-confianza-141",
+        "event_id_hasta": "c2-baja-confianza-147"
+      },
+      "G5": {
+        "metrica": "cobertura_trazabilidad",
+        "estado": "ok",
+        "valor": 1.0,
+        "cumplen": 7,
+        "total": 7,
+        "incumplen": [],
+        "n": 7,
+        "window_ids": [
+          8
+        ],
+        "event_id_desde": "c2-baja-confianza-141",
+        "event_id_hasta": "c2-baja-confianza-147"
+      },
+      "G6": {
+        "metrica": "coincidencia_version_modelo",
+        "estado": "ok",
+        "valor": 1.0,
+        "coinciden": 7,
+        "total": 7,
+        "sha256_esperado": "c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d",
+        "versiones": [
+          {
+            "model_version": "0.1.1rc0",
+            "model_sha256": "c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d",
+            "eventos": 7
+          }
+        ],
+        "n": 7,
+        "window_ids": [
+          8
+        ],
+        "event_id_desde": "c2-baja-confianza-141",
+        "event_id_hasta": "c2-baja-confianza-147"
+      },
+      "G7": {
+        "metrica": "alertas_activas",
+        "estado": "ok",
+        "valor": 2,
+        "alert_ids": [
+          "c2-baja-confianza-A-1",
+          "c2-baja-confianza-B-1"
+        ],
+        "window_ids": [
+          8
+        ]
+      }
+    }
+  ],
+  "calculado_utc": "2026-11-12T07:16:43+00:00"
+}
