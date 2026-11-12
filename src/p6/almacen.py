@@ -65,6 +65,11 @@ CREATE INDEX IF NOT EXISTS eventos_run ON eventos (run_id, frame_id);
 CREATE INDEX IF NOT EXISTS eventos_filtros ON eventos (run_id, status, zone, window_id);
 CREATE TABLE IF NOT EXISTS alertas ({_columnas(CAMPOS_ALERTA, "alert_id")});
 CREATE INDEX IF NOT EXISTS alertas_run ON alertas (run_id, opened_window_id);
+CREATE TABLE IF NOT EXISTS metricas (
+    run_id TEXT PRIMARY KEY,
+    calculado_utc TEXT NOT NULL,
+    documento TEXT NOT NULL
+);
 """
 
 
@@ -142,7 +147,7 @@ class Almacen:
     def borrar_corrida(self, run_id: str) -> None:
         """Quita la corrida y sus eventos y alertas (solo con `--sobrescribir`)."""
         with self._con:
-            for tabla in ("eventos", "alertas", "corridas"):
+            for tabla in ("eventos", "alertas", "metricas", "corridas"):
                 self._con.execute(f"DELETE FROM {tabla} WHERE run_id = ?", (run_id,))
 
     def guardar_corrida(self, run: dict[str, Any], carpeta: str, config_texto: str) -> None:
@@ -315,6 +320,21 @@ class Almacen:
     def alerta(self, alert_id: str) -> dict[str, Any] | None:
         fila = self._con.execute("SELECT * FROM alertas WHERE alert_id = ?", (alert_id,)).fetchone()
         return None if fila is None else _fila_a_dict(CAMPOS_ALERTA, fila)
+
+    # ---- métricas ---------------------------------------------------------------------
+    def guardar_metricas(self, run_id: str, documento: dict[str, Any]) -> None:
+        with self._con:
+            self._con.execute(
+                "INSERT OR REPLACE INTO metricas (run_id, calculado_utc, documento) "
+                "VALUES (?, ?, ?)",
+                (run_id, documento["calculado_utc"], json.dumps(documento, ensure_ascii=False)),
+            )
+
+    def metricas(self, run_id: str) -> dict[str, Any] | None:
+        fila = self._con.execute(
+            "SELECT documento FROM metricas WHERE run_id = ?", (run_id,)
+        ).fetchone()
+        return None if fila is None else json.loads(fila[0])
 
     # ---- exportación ----------------------------------------------------------------
     def exportar(self, run_id: str, carpeta: Path) -> dict[str, int]:

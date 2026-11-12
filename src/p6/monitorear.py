@@ -23,7 +23,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import math
 import os
 import platform
 import re
@@ -47,6 +46,13 @@ from p6.config import Config, ConfigError, cargar_config
 from p6.contrato import ValidadorEventos
 from p6.detector import DetectorError, DetectorONNX, ModeloInvalidoError
 from p6.fuente import FuenteBase, FuenteError, abrir_fuente
+from p6.metricas import (
+    calcular,
+    guardar,
+    percentil,  # noqa: F401  (también la usan scripts y pruebas)
+    resumen,
+    sha_del_descriptor,
+)
 from p6.politica import resumir_ventanas, window_id, zona
 
 RAIZ = Path(__file__).resolve().parents[2]
@@ -73,15 +79,7 @@ class Totales:
         default_factory=lambda: {m: 0 for m in ("baja", "ventana_alerta", "muestra")}
     )
     alertas: dict[str, dict[str, Any]] = field(default_factory=dict)
-
-
-def percentil(valores: list[float], p: float) -> float | None:
-    """Percentil por rango más cercano; `None` si no hay valores."""
-    if not valores:
-        return None
-    orden = sorted(valores)
-    rango = max(1, math.ceil(p / 100 * len(orden)))
-    return orden[rango - 1]
+    metricas: dict[str, Any] | None = None
 
 
 def resumen_scores(valores: list[float]) -> dict[str, float | None]:
@@ -276,6 +274,7 @@ def _correr(
             "alertas": "alertas.jsonl",
             "capturas": f"{capturas.CARPETA}/",
             "base_de_datos": os.path.relpath(db.ruta.resolve(), carpeta.resolve()),
+            "metricas": "metricas.json",
         },
         "totales": None,
     }
@@ -409,6 +408,17 @@ def _correr(
     escribir_run(carpeta, run)
     db.guardar_corrida(run, carpeta_rel, config_bytes.decode("utf-8"))
     db.exportar(run_id, carpeta)
+    # Métricas G1–G7 desde lo que quedó guardado (eventos, alertas y capturas).
+    metricas = calcular(
+        run_id,
+        db.eventos(run_id=run_id),
+        db.alertas(run_id=run_id),
+        carpeta,
+        sha_del_descriptor(cfg.descriptor),
+        cfg.confianza.minimo_con_detecciones,
+    )
+    guardar(db, run_id, metricas)
+    totales.metricas = metricas
     if error_fuente is not None:
         raise error_fuente
     return run, totales
@@ -505,6 +515,10 @@ def main(argv: list[str] | None = None) -> int:
         f"capturas: {c['total']} (baja {c['baja']}, ventana_alerta {c['ventana_alerta']}, "
         f"muestra {c['muestra']}) | alertas: {tot['alertas']} | base de datos: {almacen.ruta}"
     )
+    if t.metricas is not None:
+        print("métricas (metricas.json):")
+        for linea in resumen(t.metricas):
+            print(f"  {linea}")
     return 1 if t.error or tot["eventos_rechazados"] else 0
 
 

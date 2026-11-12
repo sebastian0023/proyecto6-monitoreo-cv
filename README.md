@@ -25,6 +25,7 @@ Cada corrida guarda sus eventos en la base de datos `resultados/monitoreo.db` y 
 - `run.json`: fuente, ritmo y muestreo, modelo y configuración con su SHA-256, política, entorno y totales por zona y por ventana.
 - `eventos.jsonl` y `alertas.jsonl`, exportados desde la base de datos.
 - `capturas/`: los JPEG conservados según la política de capturas.
+- `metricas.json`: las 7 métricas (G1–G7) por corrida y por ventana. Se recalculan desde la base de datos con `python -m p6.metricas --run-id <run_id> --recalcular`.
 
 Para consultar los eventos y las alertas en el portal (`/eventos`, `/alertas`, `/corridas`):
 

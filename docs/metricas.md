@@ -26,7 +26,7 @@ Los 7 grupos aplican. No hay exclusiones que justificar: el sistema hace inferen
 - **Percentil por rango más cercano:** con los *n* valores ordenados de menor a mayor, el percentil *p* es el valor de la posición ⌈*p*/100 · *n*⌉ (empezando en 1, mínimo 1). No se interpola.
 - **«sin datos» e «insuficiente»:** una métrica sin observaciones devuelve `sin datos`, nunca 0. Una métrica que necesita un mínimo de observaciones y no lo alcanza devuelve `insuficiente`. Ninguno de los dos equivale a «normal». La única excepción es G7, donde 0 alertas es un valor válido.
 - **Trazabilidad (M4):** cada resultado lleva su `run_id`, su `window_id` (o `corrida`), el número de observaciones y el rango de `event_id` que lo respalda, de modo que se puede ir de la cifra a los eventos.
-- **Recálculo (M5):** `python -m p6.metricas --recalcular --db resultados/monitoreo.db --run-id <run_id>` vuelve a calcular todo desde los eventos y alertas guardados y lo compara con lo guardado. Se implementa en #8 junto con `python -m p6.metricas`. Cada sección trae un ejemplo con números pequeños que #8 usa como prueba.
+- **Recálculo (M5):** `python -m p6.metricas --recalcular --db resultados/monitoreo.db --run-id <run_id>` vuelve a calcular todo desde los eventos y alertas guardados y lo compara campo por campo con lo guardado (sección 5). Cada sección trae un ejemplo con números pequeños; `tests/test_metricas.py` comprueba el código contra esos números.
 
 ## 3. Métricas
 
@@ -157,11 +157,24 @@ Los 7 grupos aplican. No hay exclusiones que justificar: el sistema hace inferen
 | G6 versión | `sin datos` | no aplica |
 | G7 alertas activas | 0 | no aplica |
 
-## 5. Estado de implementación
+## 5. Cálculo, almacenamiento y recálculo
 
-| Métrica | Datos en los eventos | Cálculo y recálculo |
-|---|---|---|
-| G1, G2, G3, G6 | Ya se producen (H1, #3) | #8 |
-| G4 | Ya se produce (H3, #5: zona y ventana) | #8 |
-| G5 | Ya se produce (H4, #6: capturas y base de datos) | #8 |
-| G7 | #7 (alertas) | #8 |
+Implementación: [`src/p6/metricas.py`](../src/p6/metricas.py), una función por métrica (`g1_latencia` … `g7_alertas_corrida`).
+
+- **Solo datos primarios.** Se calcula con las filas de `eventos` y `alertas` de la base de datos y con los archivos de captura (G5). No usa `run.json` ni ningún resultado ya agregado.
+- **Cuándo se calcula.** `python -m p6.monitorear` lo hace al terminar cada corrida. También se puede hacer a mano con `python -m p6.metricas --db resultados/monitoreo.db --run-id <run_id>`.
+- **Dónde se guarda.** En la tabla `metricas` de la base de datos y en `resultados/<run_id>/metricas.json`. El documento tiene un bloque `corrida` y una lista `ventanas`, con las 7 métricas en cada uno.
+- **Estado de cada resultado.** `ok`, `sin datos` (sin observaciones; el valor es `null`, nunca 0) o `insuficiente` (G4 con menos de 10 cuadros con detecciones). G7 siempre es `ok`: 0 alertas es un valor válido.
+- **Trazabilidad (M4).** Cada resultado lleva `n`, `window_ids`, `event_id_desde` y `event_id_hasta` de la población que usó, y los excluidos por motivo. Además, G3 lleva el `event_id` del máximo, G5 la lista de eventos que no cumplen con su motivo y G7 los `alert_id` activos.
+- **Valor esperado de G6.** Es el `sha256` de `modelo/descriptor.yaml` del repositorio (opción `--descriptor`).
+- **Recálculo (M5).** `--recalcular` vuelve a calcular el documento desde la base de datos (en modo de solo lectura) y lo compara campo por campo con el guardado, con tolerancia de 1e-9 en los números. Informa por métrica si coincide en la corrida y en todas las ventanas, lista las diferencias y termina con código 0 si todo coincide o 1 si no. `--salida archivo.txt` guarda el informe.
+
+```bash
+export PYTHONPATH=src
+python -m p6.metricas --db resultados/monitoreo.db --run-id c2-baja-confianza --recalcular
+# G1: coincide (corrida y 8 ventanas) … G7: coincide … resultado: todo coincide
+```
+
+Pruebas (`tests/test_metricas.py`): cada métrica con el ejemplo de la sección 3, incluidos sus casos `sin datos` e `insuficiente`; el documento por corrida y por ventana con su trazabilidad; y el recálculo, que coincide y detecta un dato primario alterado.
+
+Los resultados de C1 y C2 y su recálculo están en [`evidencias/metricas/`](../evidencias/metricas/).
