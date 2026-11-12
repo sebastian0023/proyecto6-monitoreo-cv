@@ -49,6 +49,7 @@ def evento_ok() -> dict[str, Any]:
         "warmup": False,
         "image_ref": None,
         "image_sha256": None,
+        "image_reason": None,
     }
 
 
@@ -78,8 +79,9 @@ def test_los_tres_estados_validos_cumplen_todas_las_etapas(fabrica, etapa):
 
 def test_una_captura_vinculada_cumple_h4():
     e = evento_ok()
-    e.update(image_ref="capturas/c1-7.jpg", image_sha256="c" * 64)
-    assert validar_evento(e, "H4") == []
+    for motivo in ("baja", "ventana_alerta", "muestra"):
+        e.update(image_ref="capturas/c1-7.jpg", image_sha256="c" * 64, image_reason=motivo)
+        assert validar_evento(e, "H4") == []
 
 
 def test_cada_campo_obligatorio_es_necesario():
@@ -177,12 +179,22 @@ def test_reglas_de_la_politica_h3():
     assert "window_id: debe ser ≥ 1" in validar_evento(e, "H3")
 
 
+JUNTOS = "image_ref, image_sha256 e image_reason: deben ir juntos o ser los tres null"
+
+
 def test_reglas_de_la_captura_h4():
     e = evento_ok()
     e["image_ref"] = "capturas/x.jpg"
-    assert "image_ref e image_sha256: deben ir juntos o ser ambos null" in validar_evento(e, "H4")
-    e["image_sha256"] = "xyz"
+    assert JUNTOS in validar_evento(e, "H4")
+    e["image_sha256"] = "c" * 64
+    assert JUNTOS in validar_evento(e, "H4")  # falta el motivo
+    e["image_reason"] = "porque si"
+    assert any(p.startswith("image_reason: debe ser uno de") for p in validar_evento(e, "H4"))
+    e.update(image_reason="baja", image_sha256="xyz")
     assert "image_sha256: debe ser SHA-256 en hexadecimal minúscula" in validar_evento(e, "H4")
+    for ruta in ("../fuera.jpg", "/etc/passwd", "capturas/../../x.jpg"):
+        e.update(image_sha256="c" * 64, image_ref=ruta)
+        assert "image_ref: debe ser una ruta relativa sin '..'" in validar_evento(e, "H4"), ruta
 
 
 def test_lo_que_no_es_un_objeto_se_rechaza():

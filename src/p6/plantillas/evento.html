@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% import "macros.html" as m %}
+{% block titulo %}Evento {{ e.event_id }}{% endblock %}
+{% block contenido %}
+<p class="sub"><a href="/corridas/{{ e.run_id }}">Corrida {{ e.run_id }}</a> ·
+  <a href="/eventos?run_id={{ e.run_id }}&ventana={{ e.window_id }}">ventana {{ e.window_id }}</a> ·
+  {% if anterior %}<a href="/eventos/{{ anterior }}">← cuadro anterior</a>{% else %}primer cuadro{% endif %} ·
+  {% if siguiente %}<a href="/eventos/{{ siguiente }}">cuadro siguiente →</a>{% else %}último cuadro{% endif %}</p>
+<h1 class="mono">{{ e.event_id }}</h1>
+<p class="sub">Cuadro {{ e.frame_id }} · {{ e.origen }} · {{ e.t_capture_utc }}</p>
+
+<div class="grid">
+  <div class="dato"><div class="k">Estado</div><div class="v">{{ m.estado(e.status) }}</div></div>
+  <div class="dato"><div class="k">Zona</div><div class="v">{{ m.zona(e.zone) }}</div></div>
+  <div class="dato"><div class="k">frame_score</div><div class="v">{{ m.score(e.frame_score) }}</div></div>
+  <div class="dato"><div class="k">Detecciones</div><div class="v">{{ e.detections|length }}</div></div>
+  <div class="dato"><div class="k">Ventana</div><div class="v"><a href="/eventos?run_id={{ e.run_id }}&ventana={{ e.window_id }}">{{ e.window_id }}</a></div></div>
+</div>
+{% if e.status == 'error' %}<div class="aviso error"><strong>Error:</strong> {{ e.error_msg }}</div>{% endif %}
+{% if e.status == 'sin_detecciones' %}<div class="aviso">Ninguna detección superó el piso del detector: el cuadro no tiene confianza ni zona, y no cuenta como baja confianza.</div>{% endif %}
+
+{% if alertas %}
+<h2>Alertas que incluyen este evento</h2>
+<ul>{% for a in alertas %}<li class="mono">{{ a.alert_id }} · regla {{ a.rule_id }} · {{ a.severity }} · {{ a.status }}</li>{% endfor %}</ul>
+{% endif %}
+
+<h2>Captura</h2>
+<div class="captura">
+{% if captura == 'ok' %}
+  <svg viewBox="0 0 {{ tamano[0] }} {{ tamano[1] }}" width="{{ tamano[0] }}" height="{{ tamano[1] }}" role="img" aria-label="Captura del evento {{ e.event_id }} con sus detecciones">
+    <image href="/capturas/{{ e.event_id }}" x="0" y="0" width="{{ tamano[0] }}" height="{{ tamano[1] }}"/>
+    {% for d in e.detections %}
+      {% set x1, y1, x2, y2 = d.bbox %}
+      <rect x="{{ x1 }}" y="{{ y1 }}" width="{{ x2 - x1 }}" height="{{ y2 - y1 }}" fill="none" stroke="{{ '#ffd400' if loop.first else '#4fc3f7' }}" stroke-width="{{ 3 if loop.first else 2 }}"/>
+      <text x="{{ x1 + 4 }}" y="{{ y1 + 16 if y1 < 20 else y1 - 5 }}" fill="{{ '#ffd400' if loop.first else '#4fc3f7' }}" font-size="15" font-family="sans-serif" font-weight="600">{{ d.class_name }} {{ '%.3f'|format(d.score) }}</text>
+    {% endfor %}
+  </svg>
+  <div class="aviso ok">Captura conservada por <strong>{{ e.image_reason }}</strong>.
+    SHA-256 verificado: <span class="mono">{{ e.image_sha256 }}</span> ·
+    archivo <a class="mono" href="/capturas/{{ e.event_id }}">{{ e.image_ref }}</a></div>
+{% elif captura == 'sin_captura' %}
+  <div class="aviso">Este evento <strong>no tiene captura</strong>. La política conserva los cuadros en zona baja, todos los de una ventana que abrió una alerta y 1 de cada 20 cuadros; este no cumplió ninguno de esos motivos (o no tenía imagen legible).</div>
+{% else %}
+  <div class="aviso error"><strong>Captura {{ estado_captura_texto[captura] }}.</strong>
+    El evento apunta a <span class="mono">{{ e.image_ref }}</span> con SHA-256 <span class="mono">{{ e.image_sha256 }}</span>,
+    pero el archivo no se puede verificar, así que no se muestra.</div>
+{% endif %}
+</div>
+
+<h2>Detecciones ({{ e.detections|length }})</h2>
+{% if e.detections %}
+<table>
+  <thead><tr><th class="num">#</th><th>Clase</th><th class="num">class_id</th><th class="num">score</th><th>bbox [x1, y1, x2, y2] (px)</th></tr></thead>
+  <tbody>
+  {% for d in e.detections %}
+    <tr><td class="num">{{ loop.index }}</td><td>{{ d.class_name }}</td><td class="num">{{ d.class_id }}</td>
+        <td class="num">{{ '%.4f'|format(d.score) }}</td><td class="mono">{{ d.bbox|join(', ') }}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+<p class="sub">Puntuaciones del modelo sin modificar (≥ piso del detector). El frame_score del cuadro es la más alta.</p>
+{% else %}
+<div class="aviso">Sin detecciones.</div>
+{% endif %}
+
+<h2>Trazabilidad</h2>
+<div class="panel">
+<dl class="campos">
+  <dt>Corrida</dt><dd><a href="/corridas/{{ e.run_id }}">{{ e.run_id }}</a></dd>
+  <dt>Fuente</dt><dd>{{ e.source_id }} ({{ e.source_kind }}) · {{ e.origen }}</dd>
+  <dt>Momento</dt><dd>{{ e.t_capture_utc }} · reloj monotónico {{ e.t_mono_ms }} ms</dd>
+  <dt>Modelo</dt><dd>{{ e.model_version }} · <span class="mono">{{ e.model_sha256 }}</span></dd>
+  <dt>Configuración</dt><dd><a class="mono" href="/configuracion/{{ e.config_sha256 }}">{{ e.config_sha256 }}</a></dd>
+  <dt>Tarea</dt><dd>{{ e.task }}</dd>
+  <dt>Tiempos</dt><dd>pre {{ e.t_pre_ms }} ms · inferencia {{ e.t_infer_ms }} ms · post {{ e.t_post_ms }} ms</dd>
+  <dt>RAM del proceso</dt><dd>{{ e.rss_mb }} MiB</dd>
+  <dt>Warmup</dt><dd>{{ 'sí' if e.warmup else 'no' }}</dd>
+  <dt>JSON</dt><dd><a href="/api/eventos/{{ e.event_id }}">/api/eventos/{{ e.event_id }}</a></dd>
+</dl>
+</div>
+{% endblock %}

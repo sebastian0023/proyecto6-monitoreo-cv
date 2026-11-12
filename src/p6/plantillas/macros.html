@@ -1,0 +1,18 @@
+{% macro zona(z) -%}
+<span class="etq z-{{ z or 'ninguna' }}">{{ z or 'sin zona' }}</span>
+{%- endmacro %}
+
+{% macro estado(s) -%}
+<span class="etq s-{{ s }}">{{ s }}</span>
+{%- endmacro %}
+
+{% macro captura(c, texto) -%}
+{%- if c == 'ok' -%}<span class="etq c-ok">{{ texto[c] }}</span>
+{%- elif c == 'sin_captura' -%}<span class="etq c-sin">{{ texto[c] }}</span>
+{%- else -%}<span class="etq c-rota">{{ texto[c] }}</span>
+{%- endif -%}
+{%- endmacro %}
+
+{% macro score(s) -%}
+{{ '%.4f'|format(s) if s is not none else '—' }}
+{%- endmacro %}

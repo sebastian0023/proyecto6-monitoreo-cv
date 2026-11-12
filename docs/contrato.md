@@ -23,11 +23,11 @@ Versión 1. Lo que guarda cada evento y cada alerta, y las reglas que se validan
 | H3 | #5 | La zona de confianza y la ventana |
 | H4 | #6 | La captura vinculada |
 
-Los eventos de esta versión del código cumplen **H3** (`ETAPA_CONTRATO` en `monitorear.py`). #6 sube la etapa a H4.
+Los eventos de esta versión del código cumplen **H4**, el contrato completo (`ETAPA_CONTRATO` en `monitorear.py`).
 
 ## 2. Evento
 
-Un evento por cuadro procesado. Se guarda en `eventos.jsonl` (una línea JSON por evento) y, desde #6, en la base de datos.
+Un evento por cuadro procesado. Se guarda en la base de datos `resultados/monitoreo.db` y se exporta a `eventos.jsonl` (una línea JSON por evento); ver [`capturas.md`](capturas.md).
 
 | Campo | Tipo | Desde | Nulo | Descripción |
 |---|---|---|---|---|
@@ -55,7 +55,8 @@ Un evento por cuadro procesado. Se guarda en `eventos.jsonl` (una línea JSON po
 | `rss_mb` | número > 0 | H1 | no | Memoria residente del proceso al terminar el cuadro, en MiB (2^20 bytes) |
 | `warmup` | booleano | H1 | no | Verdadero en los primeros `cuadros_warmup` (5) cuadros de la corrida |
 | `image_ref` | texto | H4 | sí | Ruta relativa de la captura conservada. Nulo si la política no guardó este cuadro |
-| `image_sha256` | texto | H4 | sí | SHA-256 de la captura. Va junto con `image_ref`: ambos nulos o ambos con valor |
+| `image_sha256` | texto | H4 | sí | SHA-256 de los bytes de la captura |
+| `image_reason` | texto | H4 | sí | Por qué se conservó: `baja`, `ventana_alerta` o `muestra` (ver [`capturas.md`](capturas.md)). Los tres campos de captura van juntos: los tres con valor o los tres nulos |
 
 **Cada detección** de `detections`:
 
@@ -99,7 +100,7 @@ Además del tipo de cada campo, se rechaza un evento si:
 - `frame_score` es nulo habiendo detecciones, tiene valor sin detecciones, o no es el máximo de los `score`.
 - Un tiempo es nulo con un estado distinto de `error`, o es negativo. `rss_mb` no es positivo.
 - (H3) `zone` no es una zona válida, es nula habiendo `frame_score`, o tiene valor sin él. `window_id` < 1.
-- (H4) Solo uno de `image_ref` e `image_sha256` es nulo, o `image_sha256` no es un SHA-256.
+- (H4) Los tres campos de captura no van juntos (alguno nulo y otro no), `image_sha256` no es un SHA-256, `image_reason` no es un motivo válido o `image_ref` es absoluta o contiene `..`.
 
 ### Ejemplo (ilustrativo)
 
@@ -119,13 +120,13 @@ Los valores están inventados para mostrar la forma. No salen de ninguna corrida
   ],
   "frame_score": 0.912, "zone": "aceptada", "window_id": 1,
   "t_pre_ms": 1.1, "t_infer_ms": 6.4, "t_post_ms": 0.6, "rss_mb": 212.4, "warmup": false,
-  "image_ref": null, "image_sha256": null
+  "image_ref": null, "image_sha256": null, "image_reason": null
 }
 ```
 
 ## 3. Alerta
 
-Una alerta por episodio continuo de una regla (ver `docs/PLAN.md`, sección 7): se abre cuando se cumple la condición y se cierra en la primera ventana suficiente en que deja de cumplirse. Se guarda en `alertas.jsonl` y, desde #7, en la base de datos.
+Una alerta por episodio continuo de una regla (ver `docs/PLAN.md`, sección 7): se abre cuando se cumple la condición y se cierra en la primera ventana suficiente en que deja de cumplirse. Se guarda en la base de datos y se exporta a `alertas.jsonl`; las reglas que las generan son de #7.
 
 | Campo | Tipo | Nulo | Descripción |
 |---|---|---|---|
@@ -168,7 +169,7 @@ Valores inventados; las alertas reales salen de #7.
 - `monitorear` valida cada evento antes de guardarlo. Uno que no cumple **no entra** en `eventos.jsonl`: se escribe en `rechazados.jsonl` con sus motivos y se cuenta en `run.json`:
 
 ```json
-"contrato": {"documento": "docs/contrato.md", "etapa": "H3"},
+"contrato": {"documento": "docs/contrato.md", "etapa": "H4"},
 "totales": {"eventos_aceptados": 147, "eventos_rechazados": 0, "motivos_rechazo": {}}
 ```
 
@@ -180,7 +181,7 @@ Comprobar el evento de una corrida:
 ```bash
 export PYTHONPATH=src
 python -m p6.monitorear --fuente datos/videos/normal.mp4 --sin-pausa --run-id demo | tail -3
-# contrato (etapa H3): 147 eventos aceptados, 0 rechazados
+# contrato (etapa H4): 147 eventos aceptados, 0 rechazados
 ```
 
 ## 5. Correspondencia con la rúbrica (R4.1)

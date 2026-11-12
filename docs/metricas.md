@@ -20,7 +20,7 @@ Los 7 grupos aplican. No hay exclusiones que justificar: el sistema hace inferen
 
 ## 2. Definiciones comunes
 
-- **Corrida:** un recorrido de una fuente con un `run_id`. Sus eventos están en `resultados/<run_id>/eventos.jsonl` y, desde #6, en la base de datos `resultados/monitoreo.db`.
+- **Corrida:** un recorrido de una fuente con un `run_id`. Sus eventos están en la base de datos `resultados/monitoreo.db` y se exportan a `resultados/<run_id>/eventos.jsonl` (ver [`capturas.md`](capturas.md)).
 - **Cuadro procesado:** un evento, con cualquier `status`.
 - **Ventana:** 20 cuadros procesados consecutivos, sin solapamiento (4 s a 5 cuadros/s). Su número es `window_id = (frame_id − 1) // 20 + 1`. La última ventana de una corrida puede tener menos de 20 cuadros: se calcula igual y se marca `completa: false`. El tamaño (20) está confirmado en [`politica.md`](politica.md).
 - **Percentil por rango más cercano:** con los *n* valores ordenados de menor a mayor, el percentil *p* es el valor de la posición ⌈*p*/100 · *n*⌉ (empezando en 1, mínimo 1). No se interpola.
@@ -108,7 +108,7 @@ Los 7 grupos aplican. No hay exclusiones que justificar: el sistema hace inferen
 | **Ventana** | Por corrida; por ventana cuando se pide |
 | **Exclusiones** | Ninguna. Los eventos que no cumplieron el contrato al capturarse no se guardan (van a `rechazados.jsonl`): se informan aparte como `eventos_rechazados` en `run.json` y no están en el denominador |
 | **Sin observaciones** | `sin datos` si la corrida no tiene eventos |
-| **Adquisición (M2)** | Los campos los escribe `monitorear`; las capturas y su SHA-256 se escriben en #6. El cálculo vuelve a leer los datos guardados y los archivos |
+| **Adquisición (M2)** | Los campos y las capturas con su SHA-256 los escribe `monitorear` ([`capturas.md`](capturas.md)); `capturas.verificar` comprueba cada archivo. El cálculo vuelve a leer los datos guardados y los archivos. Ya se produce en H4 (#6) |
 | **Trazabilidad (M4)** | `run_id`, total, cumplen, y la lista de `event_id` que no cumplen con su motivo |
 
 **Ejemplo (ilustrativo).** 10 eventos guardados: uno al que le falta un campo y otro cuyo `image_ref` apunta a un archivo que ya no existe. **cobertura = 8 / 10 = 0.8**, con 2 `event_id` listados como incumplidos.
@@ -163,5 +163,5 @@ Los 7 grupos aplican. No hay exclusiones que justificar: el sistema hace inferen
 |---|---|---|
 | G1, G2, G3, G6 | Ya se producen (H1, #3) | #8 |
 | G4 | Ya se produce (H3, #5: zona y ventana) | #8 |
-| G5 | #6 (capturas y base de datos) | #8 |
+| G5 | Ya se produce (H4, #6: capturas y base de datos) | #8 |
 | G7 | #7 (alertas) | #8 |

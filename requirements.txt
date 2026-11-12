@@ -8,6 +8,7 @@ psutil==7.2.2
 fastapi==0.162.5
 uvicorn==0.54.0
 Jinja2==3.1.6
+httpx==0.28.1          # cliente de pruebas del portal (fastapi.testclient)
 certifi==2026.10.23
 pytest==9.2.0
 ruff==0.17.4

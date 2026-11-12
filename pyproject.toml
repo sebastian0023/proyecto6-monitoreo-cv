@@ -5,6 +5,8 @@
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
+# Starlette sugiere httpx2 para su cliente de pruebas; se usa httpx 0.28.1 (fijado), que funciona.
+filterwarnings = ["ignore:Using `httpx` with `starlette.testclient` is deprecated"]
 
 [tool.ruff]
 line-length = 100

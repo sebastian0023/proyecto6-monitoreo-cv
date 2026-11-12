@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 
@@ -83,8 +84,17 @@ def test_los_eventos_de_la_corrida_cumplen_el_contrato(tmp_path):
     salida = tmp_path / "res"
     run, t = correr(fuente, DetectorFalso(), cfg, "r3", salida, imprimir=lambda _: None)
     eventos = [json.loads(x) for x in (salida / "eventos.jsonl").read_text().splitlines()]
-    assert all(validar_evento(e, "H3") == [] for e in eventos)  # incluye el de error
-    assert run["contrato"] == {"documento": "docs/contrato.md", "etapa": "H3"}
+    assert all(validar_evento(e, "H4") == [] for e in eventos)  # incluye el de error
+    assert run["contrato"] == {"documento": "docs/contrato.md", "etapa": "H4"}
+    # capturas: el cuadro 1 como muestra (1 de cada 20) y el 4 por zona baja; los demás no
+    assert [e["image_reason"] for e in eventos] == ["muestra", None, None, "baja"]
+    for e in eventos:
+        if e["image_ref"]:
+            assert (
+                hashlib.sha256((salida / e["image_ref"]).read_bytes()).hexdigest()
+                == e["image_sha256"]
+            )
+    assert run["totales"]["capturas"] == {"baja": 1, "ventana_alerta": 0, "muestra": 1, "total": 2}
     # zona y ventana: 0.90 es aceptada (igualdad con el superior), 0.40 baja, y los cuadros
     # sin detecciones o con error no tienen zona
     assert [e["zone"] for e in eventos] == ["aceptada", None, None, "baja"]

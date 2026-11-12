@@ -3,17 +3,20 @@
     python -m p6.monitorear --fuente datos/videos/normal.mp4 --ritmo 5 \\
         --config config/monitoreo.yaml --run-id c1-normal
 
-Por corrida escribe en `resultados/<run_id>/`:
+Los cuadros se acumulan por ventana. Al cerrarse una ventana se evalúan las reglas de alerta
+(si hay un evaluador), se decide qué cuadros conservar como imagen (`p6.capturas`), se valida
+cada evento con el contrato y se guardan en la base de datos. Por corrida queda:
 
-- `run.json`: fuente, ritmo y muestreo, modelo (versión y SHA-256), configuración (SHA-256),
-  entorno, código (commit de Git) y totales.
-- `eventos.jsonl`: un evento por cuadro procesado, con sus detecciones reales, la
-  puntuación más alta del cuadro y los tiempos por etapa. La política de confianza (#5), las
-  capturas y la base de datos (#6) se agregan sobre estos mismos eventos.
-- `rechazados.jsonl` (solo si hubo): los eventos que no cumplen `docs/contrato.md`, con sus
-  motivos. No entran en `eventos.jsonl`; `run.json` los cuenta.
+- `resultados/monitoreo.db` (`--db`): corridas, eventos y alertas (ver `p6.almacen`).
+- `resultados/<run_id>/run.json`: fuente, ritmo y muestreo, modelo (versión y SHA-256),
+  configuración (SHA-256), política de confianza y de capturas, entorno, código (commit de
+  Git) y totales, con el resumen por ventana.
+- `resultados/<run_id>/eventos.jsonl` y `alertas.jsonl`: exportados desde la base de datos.
+- `resultados/<run_id>/capturas/<event_id>.jpg`: las imágenes conservadas.
+- `resultados/<run_id>/rechazados.jsonl` (solo si hubo): los eventos que no cumplen
+  `docs/contrato.md`, con sus motivos. No entran en la base de datos; `run.json` los cuenta.
 
-Ctrl+C detiene la corrida y deja `run.json` cerrado con lo procesado hasta ese momento.
+Ctrl+C detiene la corrida: se guarda la ventana en curso y se cierra `run.json`.
 """
 
 from __future__ import annotations
@@ -21,8 +24,10 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import os
 import platform
 import re
+import shutil
 import subprocess
 import sys
 from collections.abc import Callable
@@ -35,6 +40,8 @@ import cv2
 import numpy as np
 import psutil
 
+from p6 import capturas
+from p6.almacen import Almacen, AlmacenError
 from p6.config import Config, ConfigError, cargar_config
 from p6.contrato import ValidadorEventos
 from p6.detector import DetectorError, DetectorONNX, ModeloInvalidoError
@@ -42,9 +49,12 @@ from p6.fuente import FuenteBase, FuenteError, abrir_fuente
 from p6.politica import resumir_ventanas, window_id, zona
 
 RAIZ = Path(__file__).resolve().parents[2]
-# Etapa del contrato que cumplen los eventos de esta versión: H1 es lo que produce el
-# detector y H3 agrega la zona y la ventana (#5). #6 la sube a H4 (captura vinculada).
-ETAPA_CONTRATO = "H3"
+# Etapa del contrato que cumplen los eventos: H1 es lo que produce el detector, H3 agrega la
+# zona y la ventana (#5) y H4 la captura vinculada (#6).
+ETAPA_CONTRATO = "H4"
+# Recibe el resumen de una ventana recién cerrada y sus eventos; devuelve las alertas que
+# esa ventana abrió, actualizó o cerró (las reglas son de #7).
+EvaluadorVentanas = Callable[[dict[str, Any], list[dict[str, Any]]], list[dict[str, Any]]]
 RUN_ID_VALIDO = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*")
 
 
@@ -58,6 +68,10 @@ class Totales:
     scores: list[float] = field(default_factory=list)
     zonas: dict[str, int] = field(default_factory=lambda: {"aceptada": 0, "duda": 0, "baja": 0})
     resumen_eventos: list[dict[str, Any]] = field(default_factory=list)
+    capturas: dict[str, int] = field(
+        default_factory=lambda: {m: 0 for m in ("baja", "ventana_alerta", "muestra")}
+    )
+    alertas: set[str] = field(default_factory=set)
 
 
 def percentil(valores: list[float], p: float) -> float | None:
@@ -173,9 +187,44 @@ def correr(
     carpeta: Path,
     max_cuadros: int | None = None,
     imprimir: Callable[[str], None] = print,
+    almacen: Almacen | None = None,
+    evaluador: EvaluadorVentanas | None = None,
 ) -> tuple[dict[str, Any], Totales]:
-    """Procesa la fuente y devuelve el contenido de run.json y los totales."""
+    """Procesa la fuente y devuelve el contenido de run.json y los totales.
+
+    Reemplaza cualquier dato previo de `run_id` (la CLI solo lo permite con `--sobrescribir`).
+    Sin `almacen` usa `<carpeta>/../monitoreo.db`.
+    """
+    propio = almacen is None
+    db = almacen if almacen is not None else Almacen(carpeta.parent / "monitoreo.db")
+    try:
+        return _correr(fuente, detector, cfg, run_id, carpeta, max_cuadros, imprimir, db, evaluador)
+    finally:
+        if propio:
+            db.cerrar()
+
+
+def _correr(
+    fuente: FuenteBase,
+    detector: DetectorONNX,
+    cfg: Config,
+    run_id: str,
+    carpeta: Path,
+    max_cuadros: int | None,
+    imprimir: Callable[[str], None],
+    db: Almacen,
+    evaluador: EvaluadorVentanas | None,
+) -> tuple[dict[str, Any], Totales]:
+    config_bytes = cfg.ruta.read_bytes()
+    if capturas.sha256_bytes(config_bytes) != cfg.sha256:
+        raise ConfigError(f"{cfg.ruta} cambió después de cargarse")
+    # Una corrida repetida con el mismo run_id empieza de cero.
+    db.borrar_corrida(run_id)
+    shutil.rmtree(carpeta / capturas.CARPETA, ignore_errors=True)
+    (carpeta / "rechazados.jsonl").unlink(missing_ok=True)
     carpeta.mkdir(parents=True, exist_ok=True)
+    carpeta_rel = os.path.relpath(carpeta.resolve(), db.ruta.resolve().parent)
+
     proceso = psutil.Process()
     totales = Totales()
     inicio = datetime.now(UTC)
@@ -206,63 +255,102 @@ def correr(
             "referencia_run_id": cfg.referencia.run_id,
             "p_ref": cfg.referencia.p_ref,
         },
-        "archivos": {"eventos": "eventos.jsonl"},
+        "politica_capturas": capturas.descripcion(),
+        "archivos": {
+            "eventos": "eventos.jsonl",
+            "alertas": "alertas.jsonl",
+            "capturas": f"{capturas.CARPETA}/",
+            "base_de_datos": os.path.relpath(db.ruta.resolve(), carpeta.resolve()),
+        },
         "totales": None,
     }
     escribir_run(carpeta, run)  # queda constancia aunque la corrida se corte
+    db.guardar_corrida(run, carpeta_rel, config_bytes.decode("utf-8"))
 
     validador = ValidadorEventos(ETAPA_CONTRATO)
-    ruta_rechazados = carpeta / "rechazados.jsonl"
-    ruta_rechazados.unlink(missing_ok=True)  # de una corrida anterior con el mismo run_id
     rechazados: TextIO | None = None
+    pendientes: list[tuple[dict[str, Any], np.ndarray | None]] = []
+
+    def cerrar_ventana() -> None:
+        nonlocal rechazados
+        if not pendientes:
+            return
+        eventos = [e for e, _ in pendientes]
+        wid = eventos[0]["window_id"]
+        (resumen,) = resumir_ventanas(
+            eventos, cfg.confianza.ventana_cuadros, cfg.confianza.minimo_con_detecciones
+        )
+        alertas = evaluador(resumen, eventos) if evaluador is not None else []
+        abrio = any(a["opened_window_id"] == wid for a in alertas)
+        aceptados = []
+        for evento, imagen in pendientes:
+            razon = capturas.motivo(evento, abrio)
+            ref = sha = None
+            if razon is not None and imagen is not None:
+                ref, sha = capturas.guardar(carpeta, evento["event_id"], imagen)
+            else:
+                razon = None
+            evento.update(image_ref=ref, image_sha256=sha, image_reason=razon)
+            problemas = validador.revisar(evento)
+            if problemas:
+                # Un evento que no cumple el contrato no se guarda: va aparte con sus motivos.
+                if ref is not None:
+                    (carpeta / ref).unlink(missing_ok=True)
+                if rechazados is None:
+                    rechazados = (carpeta / "rechazados.jsonl").open("w", encoding="utf-8")
+                linea = {"evento": evento, "motivos": problemas}
+                rechazados.write(json.dumps(linea, ensure_ascii=False) + "\n")
+                rechazados.flush()
+                imprimir(f"cuadro {evento['frame_id']:>4} | RECHAZADO: {'; '.join(problemas)}")
+                continue
+            aceptados.append(evento)
+            setattr(totales, evento["status"], getattr(totales, evento["status"]) + 1)
+            if evento["frame_score"] is not None:
+                totales.scores.append(evento["frame_score"])
+                totales.zonas[evento["zone"]] += 1
+            if razon is not None:
+                totales.capturas[razon] += 1
+            totales.resumen_eventos.append(
+                {k: evento[k] for k in ("event_id", "frame_id", "status", "zone", "window_id")}
+            )
+        db.insertar_eventos(aceptados)
+        if alertas:
+            db.guardar_alertas(alertas)
+            totales.alertas.update(a["alert_id"] for a in alertas)
+        pendientes.clear()
+
+    error_fuente: FuenteError | None = None
     try:
-        with (carpeta / "eventos.jsonl").open("w", encoding="utf-8") as f:
-            try:
-                for cuadro in fuente.cuadros():
-                    if max_cuadros is not None and totales.cuadros >= max_cuadros:
-                        break
-                    resultado, error = None, cuadro.error
-                    if error is None:
-                        try:
-                            resultado = detector.detectar(cuadro.imagen)
-                        except DetectorError as exc:
-                            error = str(exc)
-                    evento = _evento(
-                        run_id, cuadro, fuente, detector, cfg, proceso, resultado, error
-                    )
-                    totales.cuadros += 1
-                    problemas = validador.revisar(evento)
-                    if problemas:
-                        # Un evento que no cumple el contrato no entra en eventos.jsonl: se
-                        # guarda aparte con sus motivos y se cuenta.
-                        if rechazados is None:
-                            rechazados = ruta_rechazados.open("w", encoding="utf-8")
-                        linea = {"evento": evento, "motivos": problemas}
-                        rechazados.write(json.dumps(linea, ensure_ascii=False) + "\n")
-                        rechazados.flush()
-                        imprimir(f"cuadro {cuadro.frame_id:>4} | RECHAZADO: {'; '.join(problemas)}")
-                        continue
-                    f.write(json.dumps(evento, ensure_ascii=False) + "\n")
-                    f.flush()
-                    setattr(totales, evento["status"], getattr(totales, evento["status"]) + 1)
-                    if evento["frame_score"] is not None:
-                        totales.scores.append(evento["frame_score"])
-                        totales.zonas[evento["zone"]] += 1
-                    totales.resumen_eventos.append(
-                        {
-                            k: evento[k]
-                            for k in ("event_id", "frame_id", "status", "zone", "window_id")
-                        }
-                    )
-                    imprimir(_linea(evento))
-            except KeyboardInterrupt:
-                totales.interrumpida = True
-                imprimir("interrumpido: se cierra run.json con lo procesado")
+        for cuadro in fuente.cuadros():
+            if max_cuadros is not None and totales.cuadros >= max_cuadros:
+                break
+            resultado, error = None, cuadro.error
+            if error is None:
+                try:
+                    resultado = detector.detectar(cuadro.imagen)
+                except DetectorError as exc:
+                    error = str(exc)
+            evento = _evento(run_id, cuadro, fuente, detector, cfg, proceso, resultado, error)
+            totales.cuadros += 1
+            imprimir(_linea(evento))
+            if pendientes and pendientes[0][0]["window_id"] != evento["window_id"]:
+                cerrar_ventana()
+            pendientes.append((evento, cuadro.imagen))
+    except KeyboardInterrupt:
+        totales.interrumpida = True
+        imprimir("interrumpido: se guarda la ventana en curso y se cierra run.json")
+    except FuenteError as exc:
+        totales.interrumpida = True
+        error_fuente = exc
     finally:
-        if rechazados is not None:
-            rechazados.close()
+        try:
+            cerrar_ventana()
+        finally:
+            if rechazados is not None:
+                rechazados.close()
+
     if validador.rechazados:
-        run["archivos"]["rechazados"] = ruta_rechazados.name
+        run["archivos"]["rechazados"] = "rechazados.jsonl"
     fin = datetime.now(UTC)
     duracion = (fin - inicio).total_seconds()
     run["fin_utc"] = fin.isoformat(timespec="seconds")
@@ -277,6 +365,8 @@ def correr(
         "motivos_rechazo": dict(validador.motivos),
         "frame_score": resumen_scores(totales.scores),
         "zonas": totales.zonas,
+        "capturas": {**totales.capturas, "total": sum(totales.capturas.values())},
+        "alertas": len(totales.alertas),
         "ventanas": resumir_ventanas(
             totales.resumen_eventos,
             cfg.confianza.ventana_cuadros,
@@ -286,6 +376,10 @@ def correr(
         "cuadros_por_s_medido": round(totales.cuadros / duracion, 3) if duracion > 0 else None,
     }
     escribir_run(carpeta, run)
+    db.guardar_corrida(run, carpeta_rel, config_bytes.decode("utf-8"))
+    db.exportar(run_id, carpeta)
+    if error_fuente is not None:
+        raise error_fuente
     return run, totales
 
 
@@ -306,6 +400,9 @@ def _parser() -> argparse.ArgumentParser:
     p.add_argument("--config", type=Path, default=RAIZ / "config" / "monitoreo.yaml")
     p.add_argument("--run-id", default=None, help="identificador de la corrida")
     p.add_argument("--salida", type=Path, default=RAIZ / "resultados", help="carpeta de corridas")
+    p.add_argument(
+        "--db", type=Path, default=None, help="base de datos (por defecto <salida>/monitoreo.db)"
+    )
     p.add_argument("--sin-pausa", action="store_true", help="no esperar entre cuadros (pruebas)")
     p.add_argument("--max-cuadros", type=int, default=None, help="detenerse tras N cuadros")
     p.add_argument("--sobrescribir", action="store_true", help="reemplazar una corrida existente")
@@ -325,12 +422,17 @@ def main(argv: list[str] | None = None) -> int:
         if not RUN_ID_VALIDO.fullmatch(run_id):
             raise ConfigError(f"run_id inválido {run_id!r}: usa letras, números, punto, _ o -")
         carpeta = args.salida / run_id
-        if (carpeta / "run.json").exists() and not args.sobrescribir:
-            raise ConfigError(f"{carpeta} ya existe; usa otro --run-id o --sobrescribir")
+        almacen = Almacen(args.db or args.salida / "monitoreo.db")
+        existe = (carpeta / "run.json").exists() or almacen.existe_corrida(run_id)
+        if existe and not args.sobrescribir:
+            almacen.cerrar()
+            raise ConfigError(f"la corrida {run_id} ya existe; usa otro --run-id o --sobrescribir")
         detector = DetectorONNX.desde_config(cfg)
         fuente = abrir_fuente(args.fuente, ritmo, sin_pausa=args.sin_pausa)
-    except (ConfigError, ModeloInvalidoError, FuenteError) as exc:
+    except (ConfigError, ModeloInvalidoError, FuenteError, AlmacenError) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
+        if "almacen" in locals():
+            almacen.cerrar()
         return 2
 
     print(
@@ -339,12 +441,13 @@ def main(argv: list[str] | None = None) -> int:
         f"sha256 {detector.model_sha256[:12]}… | piso {cfg.detector.piso}"
     )
     try:
-        run, t = correr(fuente, detector, cfg, run_id, carpeta, args.max_cuadros)
+        run, t = correr(fuente, detector, cfg, run_id, carpeta, args.max_cuadros, almacen=almacen)
     except FuenteError as exc:
-        print(f"ERROR: {exc}", file=sys.stderr)
+        print(f"ERROR: {exc} (lo procesado quedó guardado)", file=sys.stderr)
         return 2
     finally:
         fuente.cerrar()
+        almacen.cerrar()
     tot = run["totales"]
     print(
         f"listo: {t.cuadros} cuadros ({t.ok} con detecciones, {t.sin_detecciones} sin, "
@@ -366,6 +469,11 @@ def main(argv: list[str] | None = None) -> int:
             "proporción baja por ventana:",
             [v["proporcion_baja"] for v in tot["ventanas"]],
         )
+    c = tot["capturas"]
+    print(
+        f"capturas: {c['total']} (baja {c['baja']}, ventana_alerta {c['ventana_alerta']}, "
+        f"muestra {c['muestra']}) | alertas: {tot['alertas']} | base de datos: {almacen.ruta}"
+    )
     return 1 if t.error or tot["eventos_rechazados"] else 0
 
 

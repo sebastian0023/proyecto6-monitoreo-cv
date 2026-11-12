@@ -1,6 +1,6 @@
 # Política de confianza y reglas de alerta
 
-Cómo se decide si un cuadro tiene confianza aceptada, dudosa o baja, y cuándo un conjunto de cuadros dispara una alerta. Cada valor sale de la corrida sobre `referencia.mp4` y está en [`config/monitoreo.yaml`](../config/monitoreo.yaml), que queda **congelada**. Los eventos que la usan siguen [`contrato.md`](contrato.md) (etapa H3); las evidencias están en [`evidencias/referencia/`](../evidencias/referencia/).
+Cómo se decide si un cuadro tiene confianza aceptada, dudosa o baja, y cuándo un conjunto de cuadros dispara una alerta. Cada valor sale de la corrida sobre `referencia.mp4` y está en [`config/monitoreo.yaml`](../config/monitoreo.yaml), que queda **congelada**. Los eventos que la usan siguen [`contrato.md`](contrato.md) (zona y ventana desde la etapa H3); las evidencias están en [`evidencias/referencia/`](../evidencias/referencia/).
 
 La confianza es la puntuación que entrega el detector. No es la probabilidad de acertar y esta política no afirma que una detección sea correcta ni que haya drift: solo describe y vigila las salidas del modelo.
 

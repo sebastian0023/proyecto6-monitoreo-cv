@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block titulo %}Error {{ codigo }}{% endblock %}
+{% block contenido %}
+<h1>Error {{ codigo }}</h1>
+<div class="aviso error">{{ mensaje }}</div>
+<p><a href="/eventos">Volver a los eventos</a></p>
+{% endblock %}

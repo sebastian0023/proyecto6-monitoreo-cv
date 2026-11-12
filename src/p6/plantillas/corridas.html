@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block titulo %}Corridas{% endblock %}
+{% block contenido %}
+<h1>Corridas</h1>
+<p class="sub">Cada corrida recorre una fuente con un modelo y una configuración identificados.</p>
+{% if corridas %}
+<div class="tabla-scroll">
+<table>
+  <thead><tr><th>Corrida</th><th>Inicio (UTC)</th><th>Fuente</th><th>Modelo</th><th>Configuración</th>
+             <th class="num">Eventos</th><th class="num">Alertas</th></tr></thead>
+  <tbody>
+  {% for c in corridas %}
+    <tr>
+      <td><a href="/corridas/{{ c.run_id }}">{{ c.run_id }}</a></td>
+      <td class="mono">{{ c.inicio_utc }}</td>
+      <td>{{ c.source_id }}</td>
+      <td>{{ c.model_version }} <span class="mono">{{ c.model_sha256[:12] }}…</span></td>
+      <td><a class="mono" href="/configuracion/{{ c.config_sha256 }}">{{ c.config_sha256[:12] }}…</a></td>
+      <td class="num"><a href="/eventos?run_id={{ c.run_id }}">{{ c.eventos }}</a></td>
+      <td class="num">{{ c.alertas }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% else %}
+<div class="aviso">No hay corridas. Ejecuta <span class="mono">python -m p6.monitorear</span>.</div>
+{% endif %}
+{% endblock %}

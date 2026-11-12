@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block titulo %}Monitoreo CV{% endblock %} · Proyecto 6</title>
+<style>
+  :root {
+    --fondo: #f6f7f9; --panel: #ffffff; --texto: #1d2330; --suave: #5b6475; --borde: #dde1e8;
+    --acento: #2f5f9e; --ok: #1f7a4d; --ok-f: #e3f3ea; --duda: #8a5a00; --duda-f: #fdf1d8;
+    --baja: #b3261e; --baja-f: #fbe4e2; --gris: #5b6475; --gris-f: #eceef2;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--fondo); color: var(--texto);
+         font: 15px/1.5 -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  header { background: var(--panel); border-bottom: 1px solid var(--borde); }
+  header .barra { max-width: 1180px; margin: 0 auto; padding: 12px 16px; display: flex;
+                  gap: 24px; align-items: center; flex-wrap: wrap; }
+  header .marca { font-weight: 650; }
+  header nav a { margin-right: 16px; color: var(--suave); text-decoration: none; }
+  header nav a.activo { color: var(--texto); font-weight: 600; }
+  main { max-width: 1180px; margin: 0 auto; padding: 20px 16px 48px; }
+  h1 { font-size: 22px; margin: 4px 0 4px; }
+  h1.mono { font-size: 20px; }
+  h2 { font-size: 17px; margin: 28px 0 10px; }
+  .sub { color: var(--suave); margin: 0 0 16px; }
+  a { color: var(--acento); }
+  .panel { background: var(--panel); border: 1px solid var(--borde); border-radius: 8px; padding: 14px 16px; }
+  table { width: 100%; border-collapse: collapse; background: var(--panel);
+          border: 1px solid var(--borde); border-radius: 8px; overflow: hidden; }
+  th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--borde); vertical-align: top; }
+  th { background: #f0f2f5; font-weight: 600; font-size: 13px; color: var(--suave); }
+  tr:last-child td { border-bottom: 0; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; word-break: break-all; }
+  .tabla-scroll { overflow-x: auto; }
+  .etq { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .z-aceptada, .s-ok, .c-ok { background: var(--ok-f); color: var(--ok); }
+  .z-duda { background: var(--duda-f); color: var(--duda); }
+  .z-baja, .s-error, .c-rota { background: var(--baja-f); color: var(--baja); }
+  .z-ninguna, .s-sin_detecciones, .c-sin { background: var(--gris-f); color: var(--gris); }
+  .aviso { border-left: 4px solid var(--gris); background: var(--gris-f); padding: 10px 14px; border-radius: 4px; margin: 8px 0; }
+  .aviso.error { border-color: var(--baja); background: var(--baja-f); }
+  .aviso.ok { border-color: var(--ok); background: var(--ok-f); }
+  form.filtros { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; margin: 0 0 14px; }
+  form.filtros label { display: flex; flex-direction: column; font-size: 12px; color: var(--suave); gap: 2px; }
+  select, input { font: inherit; padding: 5px 8px; border: 1px solid var(--borde); border-radius: 6px; background: #fff; }
+  button { font: inherit; padding: 6px 14px; border-radius: 6px; border: 1px solid var(--acento);
+           background: var(--acento); color: #fff; cursor: pointer; }
+  .paginacion { display: flex; gap: 14px; align-items: center; margin: 12px 0; color: var(--suave); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+  .dato { background: var(--panel); border: 1px solid var(--borde); border-radius: 8px; padding: 10px 12px; }
+  .dato .k { font-size: 12px; color: var(--suave); }
+  .dato .v { font-size: 18px; font-weight: 600; }
+  .captura svg { max-width: 100%; height: auto; border: 1px solid var(--borde); border-radius: 6px; background: #000; }
+  pre { background: #f0f2f5; padding: 12px; border-radius: 6px; overflow-x: auto; font-size: 13px; }
+  dl.campos { display: grid; grid-template-columns: max-content 1fr; gap: 4px 16px; margin: 0; }
+  dl.campos dt { color: var(--suave); }
+  dl.campos dd { margin: 0; }
+</style>
+</head>
+<body>
+<header><div class="barra">
+  <span class="marca">Monitoreo CV · Proyecto 6</span>
+  <nav>
+    <a href="/eventos" class="{{ 'activo' if request.url.path.startswith('/eventos') else '' }}">Eventos</a>
+    <a href="/corridas" class="{{ 'activo' if request.url.path.startswith('/corridas') else '' }}">Corridas</a>
+  </nav>
+</div></header>
+<main>
+{% block contenido %}{% endblock %}
+</main>
+</body>
+</html>

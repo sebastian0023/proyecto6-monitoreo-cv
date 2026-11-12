@@ -9,7 +9,7 @@ una etapa exige también todo lo de las anteriores:
 
 - `H1` (#3): lo que produce el detector sobre cada cuadro.
 - `H3` (#5): la zona de confianza y la ventana.
-- `H4` (#6): la captura vinculada (`image_ref`, `image_sha256`).
+- `H4` (#6): la captura vinculada (`image_ref`, `image_sha256`, `image_reason`).
 """
 
 from __future__ import annotations
@@ -28,6 +28,8 @@ ZONAS = ("aceptada", "duda", "baja")
 TIPOS_FUENTE = ("video", "carpeta", "webcam")
 ESTADOS_ALERTA = ("abierta", "cerrada")
 SEVERIDADES = ("info", "warning", "critical")
+# Por qué se conservó la captura de un cuadro (ver docs/capturas.md).
+MOTIVOS_CAPTURA = ("baja", "ventana_alerta", "muestra")
 HEX64 = re.compile(r"[0-9a-f]{64}")
 
 
@@ -97,6 +99,7 @@ CAMPOS_EVENTO: tuple[Campo, ...] = (
     Campo("warmup", "booleano"),
     Campo("image_ref", "texto", desde="H4", nulable=True),
     Campo("image_sha256", "texto", desde="H4", nulable=True),
+    Campo("image_reason", "texto", desde="H4", nulable=True),
 )
 
 CAMPOS_ALERTA: tuple[Campo, ...] = (
@@ -233,11 +236,20 @@ def validar_evento(evento: Any, etapa: str = "H1") -> list[str]:
                 problemas.append("zone: obligatoria cuando hay frame_score")
         if bien("window_id") and e["window_id"] < 1:
             problemas.append("window_id: debe ser ≥ 1")
-    if tope >= ETAPAS.index("H4") and bien("image_ref", "image_sha256"):
-        if (e["image_ref"] is None) != (e["image_sha256"] is None):
-            problemas.append("image_ref e image_sha256: deben ir juntos o ser ambos null")
-        elif e["image_sha256"] is not None and not HEX64.fullmatch(e["image_sha256"]):
-            problemas.append("image_sha256: debe ser SHA-256 en hexadecimal minúscula")
+    if tope >= ETAPAS.index("H4") and bien("image_ref", "image_sha256", "image_reason"):
+        nulos = {e[c] is None for c in ("image_ref", "image_sha256", "image_reason")}
+        if len(nulos) > 1:
+            problemas.append(
+                "image_ref, image_sha256 e image_reason: deben ir juntos o ser los tres null"
+            )
+        elif e["image_ref"] is not None:
+            if not HEX64.fullmatch(e["image_sha256"]):
+                problemas.append("image_sha256: debe ser SHA-256 en hexadecimal minúscula")
+            if e["image_reason"] not in MOTIVOS_CAPTURA:
+                problemas.append(f"image_reason: debe ser uno de {MOTIVOS_CAPTURA}")
+            ref = e["image_ref"]
+            if ref.startswith(("/", "\\")) or ".." in ref.replace("\\", "/").split("/"):
+                problemas.append("image_ref: debe ser una ruta relativa sin '..'")
     return problemas
 
 

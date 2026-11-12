@@ -6,7 +6,7 @@ Un detector YOLOX-Nano procesa un stream de video. Sus inferencias se convierten
 
 **Estado:** en construcción. El plan, las decisiones y el cronograma están en [`docs/PLAN.md`](docs/PLAN.md). El avance se sigue en los issues del hito «Entrega P6».
 
-## Instalación y primera corrida (H1)
+## Instalación y primera corrida
 
 Requiere Python 3.12.
 
@@ -21,7 +21,16 @@ python -m p6.monitorear --fuente datos/videos/normal.mp4 --ritmo 5 \
 python -m pytest
 ```
 
-Cada corrida escribe `resultados/<run_id>/run.json` (fuente, ritmo y muestreo, modelo con su SHA-256, configuración con su SHA-256, entorno) y `eventos.jsonl` (un evento por cuadro, con sus detecciones reales y los tiempos por etapa).
+Cada corrida guarda sus eventos en la base de datos `resultados/monitoreo.db` y escribe en `resultados/<run_id>/`:
+- `run.json`: fuente, ritmo y muestreo, modelo y configuración con su SHA-256, política, entorno y totales por zona y por ventana.
+- `eventos.jsonl` y `alertas.jsonl`, exportados desde la base de datos.
+- `capturas/`: los JPEG conservados según la política de capturas.
+
+Para consultar los eventos en el portal:
+
+```bash
+python -m p6.portal --db resultados/monitoreo.db      # http://127.0.0.1:8000
+```
 
 La fuente puede ser un video, una carpeta de imágenes o la webcam (`--fuente webcam:0`). `--sin-pausa` omite la espera entre cuadros.
 
@@ -32,6 +41,7 @@ La fuente puede ser un video, una carpeta de imágenes o la webcam (`--fuente we
 - [`docs/PLAN.md`](docs/PLAN.md): plan, decisiones y cronograma.
 - [`docs/contrato.md`](docs/contrato.md): campos del evento y de la alerta, y su validación.
 - [`docs/politica.md`](docs/politica.md): umbrales, zonas, ventanas y reglas de alerta, justificados con la referencia.
+- [`docs/capturas.md`](docs/capturas.md): base de datos, política de capturas y portal.
 - [`docs/metricas.md`](docs/metricas.md): las 7 métricas base (G1–G7), con definición, fórmula y ejemplo.
 
 Las instrucciones completas, el índice de evidencias y la autoría se cierran en #10.

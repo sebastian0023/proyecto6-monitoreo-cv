@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% import "macros.html" as m %}
+{% block titulo %}Corrida {{ c.run_id }}{% endblock %}
+{% block contenido %}
+{% set t = run.totales or {} %}
+<p class="sub"><a href="/corridas">Corridas</a></p>
+<h1>Corrida {{ c.run_id }}</h1>
+<p class="sub">{{ c.inicio_utc }} → {{ c.fin_utc or 'sin terminar' }} · contrato etapa {{ c.etapa_contrato }}</p>
+
+<div class="grid">
+  <div class="dato"><div class="k">Cuadros</div><div class="v"><a href="/eventos?run_id={{ c.run_id }}">{{ t.cuadros }}</a></div></div>
+  {% for z in ['aceptada', 'duda', 'baja'] %}
+  <div class="dato"><div class="k">Zona {{ z }}</div><div class="v"><a href="/eventos?run_id={{ c.run_id }}&zone={{ z }}">{{ (t.zonas or {}).get(z, 0) }}</a></div></div>
+  {% endfor %}
+  <div class="dato"><div class="k">Sin detecciones / error</div><div class="v"><a href="/eventos?run_id={{ c.run_id }}&zone=ninguna">{{ t.sin_detecciones }} / {{ t.error }}</a></div></div>
+  <div class="dato"><div class="k">Capturas</div><div class="v"><a href="/eventos?run_id={{ c.run_id }}&captura=si">{{ (t.capturas or {}).get('total', 0) }}</a></div></div>
+</div>
+
+<h2>Identidad</h2>
+<div class="panel"><dl class="campos">
+  <dt>Fuente</dt><dd>{{ run.fuente.source_id }} · ritmo declarado {{ run.fuente.ritmo_declarado_cuadros_s }} cuadros/s · muestreo: {{ run.fuente.muestreo.metodo }}{% if run.fuente.muestreo.k %} (k = {{ run.fuente.muestreo.k }}){% endif %}</dd>
+  <dt>Modelo</dt><dd>{{ run.modelo.nombre }} {{ run.modelo.version }} · <span class="mono">{{ run.modelo.sha256 }}</span> · piso {{ run.modelo.piso_puntuacion }}</dd>
+  <dt>Configuración</dt><dd><a class="mono" href="/configuracion/{{ c.config_sha256 }}">{{ c.config_sha256 }}</a></dd>
+  <dt>Política</dt><dd>inferior {{ run.politica.umbral_inferior }} · superior {{ run.politica.umbral_superior }} · ventana {{ run.politica.ventana_cuadros }} cuadros · mínimo {{ run.politica.minimo_con_detecciones }} con detecciones · p_ref {{ run.politica.p_ref }} ({{ run.politica.referencia_run_id }})</dd>
+  <dt>Código</dt><dd><span class="mono">{{ run.entorno.git_commit }}</span>{% if run.entorno.git_arbol_con_cambios %} (con cambios sin confirmar){% endif %}</dd>
+  <dt>Entorno</dt><dd>{{ run.entorno.so }} · Python {{ run.entorno.python }} · onnxruntime {{ run.entorno.onnxruntime }}</dd>
+</dl></div>
+
+{% if t.ventanas %}
+<h2>Ventanas</h2>
+<div class="tabla-scroll">
+<table>
+  <thead><tr><th class="num">Ventana</th><th class="num">Cuadros</th><th class="num">Con detecciones</th>
+    <th class="num">Aceptada</th><th class="num">Duda</th><th class="num">Baja</th><th class="num">Proporción baja</th><th>Eventos</th></tr></thead>
+  <tbody>
+  {% for v in t.ventanas %}
+    <tr>
+      <td class="num"><a href="/eventos?run_id={{ c.run_id }}&ventana={{ v.window_id }}">{{ v.window_id }}</a></td>
+      <td class="num">{{ v.cuadros }}{% if not v.completa %} (parcial){% endif %}</td>
+      <td class="num">{{ v.con_detecciones }}</td>
+      <td class="num">{{ v.aceptada }}</td><td class="num">{{ v.duda }}</td><td class="num">{{ v.baja }}</td>
+      <td class="num">{% if v.suficiente %}{{ '%.2f'|format(v.proporcion_baja) }}{% else %}<span class="etq z-ninguna">insuficiente</span>{% endif %}</td>
+      <td class="mono">{{ v.event_id_desde }} … {{ v.event_id_hasta }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endif %}
+
+<h2>run.json</h2>
+<details><summary>Ver completo</summary><pre>{{ run|tojson(indent=2) }}</pre></details>
+{% endblock %}

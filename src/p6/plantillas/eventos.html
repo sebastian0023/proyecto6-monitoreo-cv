@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% import "macros.html" as m %}
+{% block titulo %}Eventos{% endblock %}
+{% block contenido %}
+<h1>Eventos</h1>
+<p class="sub">Un evento por cuadro procesado. {{ total }} evento{{ '' if total == 1 else 's' }} con estos filtros.</p>
+
+<form class="filtros" method="get" action="/eventos">
+  <label>Corrida
+    <select name="run_id">
+      <option value="">todas</option>
+      {% for c in corridas %}<option value="{{ c.run_id }}" {{ 'selected' if filtros.run_id == c.run_id }}>{{ c.run_id }}</option>{% endfor %}
+    </select>
+  </label>
+  <label>Estado
+    <select name="status">
+      <option value="">todos</option>
+      {% for s in estados %}<option value="{{ s }}" {{ 'selected' if filtros.status == s }}>{{ s }}</option>{% endfor %}
+    </select>
+  </label>
+  <label>Zona
+    <select name="zone">
+      <option value="">todas</option>
+      {% for z in zonas %}<option value="{{ z }}" {{ 'selected' if filtros.zone == z }}>{{ z }}</option>{% endfor %}
+      <option value="ninguna" {{ 'selected' if filtros.zone == 'ninguna' }}>sin zona</option>
+    </select>
+  </label>
+  <label>Ventana
+    <input name="ventana" type="number" min="1" style="width:90px" value="{{ filtros.window_id or '' }}">
+  </label>
+  <label>Captura
+    <select name="captura">
+      <option value="">todas</option>
+      <option value="si" {{ 'selected' if filtros.con_captura == true }}>con captura</option>
+      <option value="no" {{ 'selected' if filtros.con_captura == false }}>sin captura</option>
+    </select>
+  </label>
+  <button type="submit">Filtrar</button>
+  <a href="/eventos">Quitar filtros</a>
+</form>
+
+{% if eventos %}
+<div class="tabla-scroll">
+<table>
+  <thead><tr>
+    <th>Evento</th><th>Corrida</th><th class="num">Cuadro</th><th>Capturado (UTC)</th>
+    <th>Estado</th><th>Zona</th><th class="num">frame_score</th><th>Mejor detección</th>
+    <th class="num">Ventana</th><th>Captura</th>
+  </tr></thead>
+  <tbody>
+  {% for e in eventos %}
+    <tr>
+      <td class="mono"><a href="/eventos/{{ e.event_id }}">{{ e.event_id }}</a></td>
+      <td><a href="/corridas/{{ e.run_id }}">{{ e.run_id }}</a></td>
+      <td class="num">{{ e.frame_id }}</td>
+      <td class="mono">{{ e.t_capture_utc[:23] }}</td>
+      <td>{{ m.estado(e.status) }}</td>
+      <td>{{ m.zona(e.zone) }}</td>
+      <td class="num">{{ m.score(e.frame_score) }}</td>
+      <td>{% if e.detections %}{{ e.detections[0].class_name }}{% else %}—{% endif %}</td>
+      <td class="num"><a href="/eventos?run_id={{ e.run_id }}&ventana={{ e.window_id }}">{{ e.window_id }}</a></td>
+      <td>{{ m.captura(e._captura, estado_captura_texto) }}{% if e.image_reason %} <small>({{ e.image_reason }})</small>{% endif %}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+<div class="paginacion">
+  {% if anterior %}<a href="{{ anterior }}">← anterior</a>{% endif %}
+  <span>página {{ pagina_actual }} de {{ paginas }}</span>
+  {% if siguiente %}<a href="{{ siguiente }}">siguiente →</a>{% endif %}
+</div>
+{% else %}
+<div class="aviso">No hay eventos con estos filtros.</div>
+{% endif %}
+{% endblock %}

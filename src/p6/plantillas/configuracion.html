@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block titulo %}Configuración {{ sha[:12] }}{% endblock %}
+{% block contenido %}
+<h1>Configuración</h1>
+<p class="sub mono">{{ sha }}</p>
+{% if calculado == sha %}
+<div class="aviso ok">SHA-256 verificado: el texto de abajo es exactamente la configuración que produjo los eventos con este <span class="mono">config_sha256</span>.</div>
+{% else %}
+<div class="aviso error">El SHA-256 del texto guardado (<span class="mono">{{ calculado }}</span>) no coincide con el registrado.</div>
+{% endif %}
+<p>Corridas que la usaron:
+{% for r in corridas %}<a href="/corridas/{{ r }}">{{ r }}</a>{{ ', ' if not loop.last }}{% endfor %}</p>
+<pre>{{ texto }}</pre>
+{% endblock %}
