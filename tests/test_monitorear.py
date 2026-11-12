@@ -9,6 +9,7 @@ import pytest
 import yaml
 
 from p6.config import ConfigError, cargar_config, sha256_archivo
+from p6.contrato import validar_evento
 from p6.detector import Deteccion, DetectorError, Resultado
 from p6.fuente import FuenteCarpeta
 from p6.monitorear import correr, main, percentil, resumen_scores
@@ -74,6 +75,50 @@ def test_correr_guarda_un_evento_por_cuadro_y_el_run_json(tmp_path):
     assert {"so", "python", "onnxruntime"} <= set(guardado["entorno"])
     assert guardado["totales"]["cuadros"] == 6
     assert guardado["totales"]["frame_score"]["n"] == 4
+
+
+def test_los_eventos_de_la_corrida_cumplen_el_contrato(tmp_path):
+    cfg = cargar_config(CONFIG)
+    fuente = FuenteCarpeta(carpeta_con(tmp_path, [90, 0, 255, 40]), 5, sin_pausa=True)
+    salida = tmp_path / "res"
+    run, t = correr(fuente, DetectorFalso(), cfg, "r3", salida, imprimir=lambda _: None)
+    eventos = [json.loads(x) for x in (salida / "eventos.jsonl").read_text().splitlines()]
+    assert all(validar_evento(e, "H1") == [] for e in eventos)  # incluye el de error
+    assert run["contrato"] == {"documento": "docs/contrato.md", "etapa": "H1"}
+    assert run["totales"]["eventos_aceptados"] == 4 and run["totales"]["eventos_rechazados"] == 0
+    assert not (salida / "rechazados.jsonl").exists() and "rechazados" not in run["archivos"]
+
+
+def test_un_evento_incompleto_se_rechaza_se_guarda_aparte_y_se_cuenta(tmp_path):
+    class DetectorRoto(DetectorFalso):
+        def detectar(self, bgr):
+            if int(bgr[0, 0, 0]) == 20:  # tiempo negativo: viola el contrato
+                return Resultado([], 1.0, -5.0, 0.5, ancho=64, alto=48)
+            return super().detectar(bgr)
+
+    cfg = cargar_config(CONFIG)
+    fuente = FuenteCarpeta(carpeta_con(tmp_path, [90, 20, 70]), 5, sin_pausa=True)
+    salida = tmp_path / "res"
+    lineas: list[str] = []
+    run, t = correr(fuente, DetectorRoto(), cfg, "r4", salida, imprimir=lineas.append)
+
+    assert t.cuadros == 3 and (t.ok, t.sin_detecciones, t.error) == (2, 0, 0)
+    eventos = [json.loads(x) for x in (salida / "eventos.jsonl").read_text().splitlines()]
+    assert [e["frame_id"] for e in eventos] == [1, 3]  # el rechazado no entra
+    (rechazado,) = [json.loads(x) for x in (salida / "rechazados.jsonl").read_text().splitlines()]
+    assert rechazado["evento"]["frame_id"] == 2
+    assert rechazado["motivos"] == ["t_infer_ms: no puede ser negativo"]
+    tot = run["totales"]
+    assert (tot["eventos_aceptados"], tot["eventos_rechazados"]) == (2, 1)
+    assert tot["motivos_rechazo"] == {"t_infer_ms": 1}
+    assert run["archivos"]["rechazados"] == "rechazados.jsonl"
+    assert any("RECHAZADO" in x and "t_infer_ms" in x for x in lineas)
+
+    # una corrida nueva con el mismo run_id no hereda los rechazados de la anterior
+    (tmp_path / "otra").mkdir()
+    fuente = FuenteCarpeta(carpeta_con(tmp_path / "otra", [90]), 5, sin_pausa=True)
+    correr(fuente, DetectorFalso(), cfg, "r4", salida, imprimir=lambda _: None)
+    assert not (salida / "rechazados.jsonl").exists()
 
 
 def test_max_cuadros_detiene_la_corrida(tmp_path):

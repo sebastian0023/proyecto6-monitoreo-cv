@@ -27,4 +27,10 @@ La fuente puede ser un video, una carpeta de imágenes o la webcam (`--fuente we
 
 **Nota para macOS:** no se usa `pip install -e .` porque deja un archivo `.pth` que macOS marca como oculto en carpetas sincronizadas con iCloud y Python 3.12 lo ignora. Por eso los comandos usan `PYTHONPATH=src`.
 
+## Documentos
+
+- [`docs/PLAN.md`](docs/PLAN.md): plan, decisiones y cronograma.
+- [`docs/contrato.md`](docs/contrato.md): campos del evento y de la alerta, y su validación.
+- [`docs/metricas.md`](docs/metricas.md): las 7 métricas base (G1–G7), con definición, fórmula y ejemplo.
+
 Las instrucciones completas, el índice de evidencias y la autoría se cierran en #10.

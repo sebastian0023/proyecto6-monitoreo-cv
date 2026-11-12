@@ -10,6 +10,8 @@ Por corrida escribe en `resultados/<run_id>/`:
 - `eventos.jsonl`: un evento por cuadro procesado, con sus detecciones reales, la
   puntuación más alta del cuadro y los tiempos por etapa. La política de confianza (#5), las
   capturas y la base de datos (#6) se agregan sobre estos mismos eventos.
+- `rechazados.jsonl` (solo si hubo): los eventos que no cumplen `docs/contrato.md`, con sus
+  motivos. No entran en `eventos.jsonl`; `run.json` los cuenta.
 
 Ctrl+C detiene la corrida y deja `run.json` cerrado con lo procesado hasta ese momento.
 """
@@ -27,17 +29,21 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, TextIO
 
 import cv2
 import numpy as np
 import psutil
 
 from p6.config import Config, ConfigError, cargar_config
+from p6.contrato import ValidadorEventos
 from p6.detector import DetectorError, DetectorONNX, ModeloInvalidoError
 from p6.fuente import FuenteBase, FuenteError, abrir_fuente
 
 RAIZ = Path(__file__).resolve().parents[2]
+# Etapa del contrato que cumplen los eventos de esta versión: H1 es lo que produce el
+# detector. #5 la sube a H3 (zona y ventana) y #6 a H4 (captura vinculada).
+ETAPA_CONTRATO = "H1"
 RUN_ID_VALIDO = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*")
 
 
@@ -183,33 +189,57 @@ def correr(
         "configuracion": {"archivo": str(cfg.ruta), "sha256": cfg.sha256},
         "entorno": entorno(),
         "cuadros_warmup": cfg.cuadros_warmup,
+        "contrato": {"documento": "docs/contrato.md", "etapa": ETAPA_CONTRATO},
         "archivos": {"eventos": "eventos.jsonl"},
         "totales": None,
     }
     escribir_run(carpeta, run)  # queda constancia aunque la corrida se corte
 
-    with (carpeta / "eventos.jsonl").open("w", encoding="utf-8") as f:
-        try:
-            for cuadro in fuente.cuadros():
-                if max_cuadros is not None and totales.cuadros >= max_cuadros:
-                    break
-                resultado, error = None, cuadro.error
-                if error is None:
-                    try:
-                        resultado = detector.detectar(cuadro.imagen)
-                    except DetectorError as exc:
-                        error = str(exc)
-                evento = _evento(run_id, cuadro, fuente, detector, cfg, proceso, resultado, error)
-                f.write(json.dumps(evento, ensure_ascii=False) + "\n")
-                f.flush()
-                totales.cuadros += 1
-                setattr(totales, evento["status"], getattr(totales, evento["status"]) + 1)
-                if evento["frame_score"] is not None:
-                    totales.scores.append(evento["frame_score"])
-                imprimir(_linea(evento))
-        except KeyboardInterrupt:
-            totales.interrumpida = True
-            imprimir("interrumpido: se cierra run.json con lo procesado")
+    validador = ValidadorEventos(ETAPA_CONTRATO)
+    ruta_rechazados = carpeta / "rechazados.jsonl"
+    ruta_rechazados.unlink(missing_ok=True)  # de una corrida anterior con el mismo run_id
+    rechazados: TextIO | None = None
+    try:
+        with (carpeta / "eventos.jsonl").open("w", encoding="utf-8") as f:
+            try:
+                for cuadro in fuente.cuadros():
+                    if max_cuadros is not None and totales.cuadros >= max_cuadros:
+                        break
+                    resultado, error = None, cuadro.error
+                    if error is None:
+                        try:
+                            resultado = detector.detectar(cuadro.imagen)
+                        except DetectorError as exc:
+                            error = str(exc)
+                    evento = _evento(
+                        run_id, cuadro, fuente, detector, cfg, proceso, resultado, error
+                    )
+                    totales.cuadros += 1
+                    problemas = validador.revisar(evento)
+                    if problemas:
+                        # Un evento que no cumple el contrato no entra en eventos.jsonl: se
+                        # guarda aparte con sus motivos y se cuenta.
+                        if rechazados is None:
+                            rechazados = ruta_rechazados.open("w", encoding="utf-8")
+                        linea = {"evento": evento, "motivos": problemas}
+                        rechazados.write(json.dumps(linea, ensure_ascii=False) + "\n")
+                        rechazados.flush()
+                        imprimir(f"cuadro {cuadro.frame_id:>4} | RECHAZADO: {'; '.join(problemas)}")
+                        continue
+                    f.write(json.dumps(evento, ensure_ascii=False) + "\n")
+                    f.flush()
+                    setattr(totales, evento["status"], getattr(totales, evento["status"]) + 1)
+                    if evento["frame_score"] is not None:
+                        totales.scores.append(evento["frame_score"])
+                    imprimir(_linea(evento))
+            except KeyboardInterrupt:
+                totales.interrumpida = True
+                imprimir("interrumpido: se cierra run.json con lo procesado")
+    finally:
+        if rechazados is not None:
+            rechazados.close()
+    if validador.rechazados:
+        run["archivos"]["rechazados"] = ruta_rechazados.name
     fin = datetime.now(UTC)
     duracion = (fin - inicio).total_seconds()
     run["fin_utc"] = fin.isoformat(timespec="seconds")
@@ -219,6 +249,9 @@ def correr(
         "sin_detecciones": totales.sin_detecciones,
         "error": totales.error,
         "interrumpida": totales.interrumpida,
+        "eventos_aceptados": validador.aceptados,
+        "eventos_rechazados": validador.rechazados,
+        "motivos_rechazo": dict(validador.motivos),
         "frame_score": resumen_scores(totales.scores),
         "duracion_s": round(duracion, 3),
         "cuadros_por_s_medido": round(totales.cuadros / duracion, 3) if duracion > 0 else None,
@@ -283,17 +316,22 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     finally:
         fuente.cerrar()
+    tot = run["totales"]
     print(
         f"listo: {t.cuadros} cuadros ({t.ok} con detecciones, {t.sin_detecciones} sin, "
-        f"{t.error} con error) en {run['totales']['duracion_s']} s -> {carpeta}"
+        f"{t.error} con error) en {tot['duracion_s']} s -> {carpeta}"
     )
-    s = run["totales"]["frame_score"]
+    print(
+        f"contrato (etapa {ETAPA_CONTRATO}): {tot['eventos_aceptados']} eventos aceptados, "
+        f"{tot['eventos_rechazados']} rechazados"
+    )
+    s = tot["frame_score"]
     if s["n"]:
         print(
             f"frame_score ({s['n']} cuadros con detecciones): min {s['min']} | p10 {s['p10']} "
             f"| p50 {s['p50']} | p90 {s['p90']} | max {s['max']}"
         )
-    return 1 if t.error else 0
+    return 1 if t.error or tot["eventos_rechazados"] else 0
 
 
 if __name__ == "__main__":
