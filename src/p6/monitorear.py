@@ -39,11 +39,12 @@ from p6.config import Config, ConfigError, cargar_config
 from p6.contrato import ValidadorEventos
 from p6.detector import DetectorError, DetectorONNX, ModeloInvalidoError
 from p6.fuente import FuenteBase, FuenteError, abrir_fuente
+from p6.politica import resumir_ventanas, window_id, zona
 
 RAIZ = Path(__file__).resolve().parents[2]
 # Etapa del contrato que cumplen los eventos de esta versión: H1 es lo que produce el
-# detector. #5 la sube a H3 (zona y ventana) y #6 a H4 (captura vinculada).
-ETAPA_CONTRATO = "H1"
+# detector y H3 agrega la zona y la ventana (#5). #6 la sube a H4 (captura vinculada).
+ETAPA_CONTRATO = "H3"
 RUN_ID_VALIDO = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*")
 
 
@@ -55,6 +56,8 @@ class Totales:
     error: int = 0
     interrumpida: bool = False
     scores: list[float] = field(default_factory=list)
+    zonas: dict[str, int] = field(default_factory=lambda: {"aceptada": 0, "duda": 0, "baja": 0})
+    resumen_eventos: list[dict[str, Any]] = field(default_factory=list)
 
 
 def percentil(valores: list[float], p: float) -> float | None:
@@ -121,6 +124,8 @@ def _evento(
         detecciones = [d.como_dict() for d in resultado.detecciones]
         score = resultado.frame_score
         status = "ok" if detecciones else "sin_detecciones"
+    frame_score = None if score is None else round(score, 6)
+    conf = cfg.confianza
     return {
         "event_id": f"{run_id}-{cuadro.frame_id}",
         "run_id": run_id,
@@ -137,7 +142,9 @@ def _evento(
         "status": status,
         "error_msg": error,
         "detections": detecciones,
-        "frame_score": None if score is None else round(score, 6),
+        "frame_score": frame_score,
+        "zone": zona(frame_score, conf.umbral_inferior, conf.umbral_superior),
+        "window_id": window_id(cuadro.frame_id, conf.ventana_cuadros),
         "t_pre_ms": None if resultado is None else round(resultado.t_pre_ms, 3),
         "t_infer_ms": None if resultado is None else round(resultado.t_infer_ms, 3),
         "t_post_ms": None if resultado is None else round(resultado.t_post_ms, 3),
@@ -154,7 +161,7 @@ def _linea(e: dict[str, Any]) -> str:
     mejor = e["detections"][0]
     return (
         f"cuadro {e['frame_id']:>4} | {len(e['detections']):>2} det | mejor "
-        f"{mejor['class_name']} {mejor['score']:.3f} | infer {e['t_infer_ms']:.1f} ms"
+        f"{mejor['class_name']} {mejor['score']:.3f} [{e['zone']}] | infer {e['t_infer_ms']:.1f} ms"
     )
 
 
@@ -190,6 +197,15 @@ def correr(
         "entorno": entorno(),
         "cuadros_warmup": cfg.cuadros_warmup,
         "contrato": {"documento": "docs/contrato.md", "etapa": ETAPA_CONTRATO},
+        "politica": {
+            "documento": "docs/politica.md",
+            "umbral_inferior": cfg.confianza.umbral_inferior,
+            "umbral_superior": cfg.confianza.umbral_superior,
+            "ventana_cuadros": cfg.confianza.ventana_cuadros,
+            "minimo_con_detecciones": cfg.confianza.minimo_con_detecciones,
+            "referencia_run_id": cfg.referencia.run_id,
+            "p_ref": cfg.referencia.p_ref,
+        },
         "archivos": {"eventos": "eventos.jsonl"},
         "totales": None,
     }
@@ -231,6 +247,13 @@ def correr(
                     setattr(totales, evento["status"], getattr(totales, evento["status"]) + 1)
                     if evento["frame_score"] is not None:
                         totales.scores.append(evento["frame_score"])
+                        totales.zonas[evento["zone"]] += 1
+                    totales.resumen_eventos.append(
+                        {
+                            k: evento[k]
+                            for k in ("event_id", "frame_id", "status", "zone", "window_id")
+                        }
+                    )
                     imprimir(_linea(evento))
             except KeyboardInterrupt:
                 totales.interrumpida = True
@@ -253,6 +276,12 @@ def correr(
         "eventos_rechazados": validador.rechazados,
         "motivos_rechazo": dict(validador.motivos),
         "frame_score": resumen_scores(totales.scores),
+        "zonas": totales.zonas,
+        "ventanas": resumir_ventanas(
+            totales.resumen_eventos,
+            cfg.confianza.ventana_cuadros,
+            cfg.confianza.minimo_con_detecciones,
+        ),
         "duracion_s": round(duracion, 3),
         "cuadros_por_s_medido": round(totales.cuadros / duracion, 3) if duracion > 0 else None,
     }
@@ -330,6 +359,12 @@ def main(argv: list[str] | None = None) -> int:
         print(
             f"frame_score ({s['n']} cuadros con detecciones): min {s['min']} | p10 {s['p10']} "
             f"| p50 {s['p50']} | p90 {s['p90']} | max {s['max']}"
+        )
+        z = tot["zonas"]
+        print(f"zonas: aceptada {z['aceptada']} | duda {z['duda']} | baja {z['baja']}")
+        print(
+            "proporción baja por ventana:",
+            [v["proporcion_baja"] for v in tot["ventanas"]],
         )
     return 1 if t.error or tot["eventos_rechazados"] else 0
 

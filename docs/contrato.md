@@ -23,7 +23,7 @@ Versión 1. Lo que guarda cada evento y cada alerta, y las reglas que se validan
 | H3 | #5 | La zona de confianza y la ventana |
 | H4 | #6 | La captura vinculada |
 
-Los eventos de esta versión del código cumplen **H1** (`ETAPA_CONTRATO` en `monitorear.py`). #5 y #6 suben la etapa a H3 y H4.
+Los eventos de esta versión del código cumplen **H3** (`ETAPA_CONTRATO` en `monitorear.py`). #6 sube la etapa a H4.
 
 ## 2. Evento
 
@@ -48,7 +48,7 @@ Un evento por cuadro procesado. Se guarda en `eventos.jsonl` (una línea JSON po
 | `detections` | lista | H1 | no | Cada detección con puntuación ≥ piso del detector. Vacía con `sin_detecciones` y con `error` |
 | `frame_score` | número | H1 | sí | Puntuación más alta entre las detecciones del cuadro. Nulo sin detecciones o con error |
 | `zone` | texto | H3 | sí | `aceptada`, `duda` o `baja`. Nulo si `frame_score` es nulo |
-| `window_id` | entero ≥ 1 | H3 | no | Ventana del cuadro: `(frame_id − 1) // 20 + 1` (20 cuadros consecutivos sin solapamiento; el tamaño se confirma en #5) |
+| `window_id` | entero ≥ 1 | H3 | no | Ventana del cuadro: `(frame_id − 1) // 20 + 1` (20 cuadros consecutivos sin solapamiento; tamaño en `config/monitoreo.yaml`, ver [`politica.md`](politica.md)) |
 | `t_pre_ms` | número ≥ 0 | H1 | sí | Preprocesamiento (letterbox). Nulo solo con `error` |
 | `t_infer_ms` | número ≥ 0 | H1 | sí | Inferencia del modelo. Nulo solo con `error` |
 | `t_post_ms` | número ≥ 0 | H1 | sí | Posprocesamiento (decodificación y NMS). Nulo solo con `error` |
@@ -76,9 +76,9 @@ Un evento por cuadro procesado. Se guarda en `eventos.jsonl` (una línea JSON po
 
 `sin_detecciones` y `error` son estados aparte: no tienen confianza cero y no entran en el cálculo de baja confianza.
 
-### Zonas (se asignan en #5)
+### Zonas
 
-Con el umbral inferior `u_inf` y el superior `u_sup` de `config/monitoreo.yaml`, sobre `frame_score` = s:
+Las asigna la política ([`politica.md`](politica.md)). Con el umbral inferior `u_inf` (0.85) y el superior `u_sup` (0.90) de `config/monitoreo.yaml`, sobre `frame_score` = s:
 
 - `aceptada`: s ≥ `u_sup`.
 - `duda`: `u_inf` ≤ s < `u_sup`.
@@ -168,7 +168,7 @@ Valores inventados; las alertas reales salen de #7.
 - `monitorear` valida cada evento antes de guardarlo. Uno que no cumple **no entra** en `eventos.jsonl`: se escribe en `rechazados.jsonl` con sus motivos y se cuenta en `run.json`:
 
 ```json
-"contrato": {"documento": "docs/contrato.md", "etapa": "H1"},
+"contrato": {"documento": "docs/contrato.md", "etapa": "H3"},
 "totales": {"eventos_aceptados": 147, "eventos_rechazados": 0, "motivos_rechazo": {}}
 ```
 
@@ -180,7 +180,7 @@ Comprobar el evento de una corrida:
 ```bash
 export PYTHONPATH=src
 python -m p6.monitorear --fuente datos/videos/normal.mp4 --sin-pausa --run-id demo | tail -3
-# contrato (etapa H1): 147 eventos aceptados, 0 rechazados
+# contrato (etapa H3): 147 eventos aceptados, 0 rechazados
 ```
 
 ## 5. Correspondencia con la rúbrica (R4.1)

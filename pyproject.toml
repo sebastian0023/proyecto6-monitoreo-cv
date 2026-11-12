@@ -13,3 +13,7 @@ src = ["src", "tests", "scripts"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP"]
+
+[tool.ruff.lint.per-file-ignores]
+# Textos y marcas del SVG con líneas largas
+"scripts/calibrar_referencia.py" = ["E501"]

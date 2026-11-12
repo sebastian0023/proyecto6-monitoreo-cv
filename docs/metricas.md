@@ -22,7 +22,7 @@ Los 7 grupos aplican. No hay exclusiones que justificar: el sistema hace inferen
 
 - **Corrida:** un recorrido de una fuente con un `run_id`. Sus eventos están en `resultados/<run_id>/eventos.jsonl` y, desde #6, en la base de datos `resultados/monitoreo.db`.
 - **Cuadro procesado:** un evento, con cualquier `status`.
-- **Ventana:** 20 cuadros procesados consecutivos, sin solapamiento (4 s a 5 cuadros/s). Su número es `window_id = (frame_id − 1) // 20 + 1`. La última ventana de una corrida puede tener menos de 20 cuadros: se calcula igual y se marca `completa: false`. El tamaño se confirma en #5.
+- **Ventana:** 20 cuadros procesados consecutivos, sin solapamiento (4 s a 5 cuadros/s). Su número es `window_id = (frame_id − 1) // 20 + 1`. La última ventana de una corrida puede tener menos de 20 cuadros: se calcula igual y se marca `completa: false`. El tamaño (20) está confirmado en [`politica.md`](politica.md).
 - **Percentil por rango más cercano:** con los *n* valores ordenados de menor a mayor, el percentil *p* es el valor de la posición ⌈*p*/100 · *n*⌉ (empezando en 1, mínimo 1). No se interpola.
 - **«sin datos» e «insuficiente»:** una métrica sin observaciones devuelve `sin datos`, nunca 0. Una métrica que necesita un mínimo de observaciones y no lo alcanza devuelve `insuficiente`. Ninguno de los dos equivale a «normal». La única excepción es G7, donde 0 alertas es un valor válido.
 - **Trazabilidad (M4):** cada resultado lleva su `run_id`, su `window_id` (o `corrida`), el número de observaciones y el rango de `event_id` que lo respalda, de modo que se puede ir de la cifra a los eventos.
@@ -91,8 +91,8 @@ Los 7 grupos aplican. No hay exclusiones que justificar: el sistema hace inferen
 | **Población** | Eventos con `status` igual a `ok`. El denominador son los cuadros **con detecciones** |
 | **Ventana** | Por ventana y por corrida |
 | **Exclusiones** | `sin_detecciones` y `error` (no tienen puntuación; no equivalen a confianza cero). `warmup` no se excluye |
-| **Sin observaciones** | `insuficiente` si hay menos de 10 cuadros con detecciones (mínimo de partida; se confirma en #5). `sin datos` si no hay eventos |
-| **Adquisición (M2)** | `frame_score` es el máximo de los `score` que entrega el detector sin modificar; `zone` la asigna la política de #5 con los umbrales de `config/monitoreo.yaml`. Se produce desde H3 |
+| **Sin observaciones** | `insuficiente` si hay menos de 10 cuadros con detecciones (mínimo confirmado en [`politica.md`](politica.md)). `sin datos` si no hay eventos |
+| **Adquisición (M2)** | `frame_score` es el máximo de los `score` que entrega el detector sin modificar; `zone` la asigna la política de #5 con los umbrales de `config/monitoreo.yaml`. Ya se produce en H3 (#5) |
 | **Trazabilidad (M4)** | `run_id`, `window_id`, cuadros en baja, cuadros con detecciones, rango de `event_id` |
 
 **Ejemplo (ilustrativo).** Una ventana de 20 cuadros: 4 `sin_detecciones` y 16 `ok`, de los cuales 6 en zona `baja`. **p = 6 / 16 = 0.375**. Otra ventana con solo 8 cuadros `ok` devuelve **insuficiente**, no 0.
@@ -162,6 +162,6 @@ Los 7 grupos aplican. No hay exclusiones que justificar: el sistema hace inferen
 | Métrica | Datos en los eventos | Cálculo y recálculo |
 |---|---|---|
 | G1, G2, G3, G6 | Ya se producen (H1, #3) | #8 |
-| G4 | #5 (zona y ventana) | #8 |
+| G4 | Ya se produce (H3, #5: zona y ventana) | #8 |
 | G5 | #6 (capturas y base de datos) | #8 |
 | G7 | #7 (alertas) | #8 |

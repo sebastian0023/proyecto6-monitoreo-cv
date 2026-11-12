@@ -83,8 +83,18 @@ def test_los_eventos_de_la_corrida_cumplen_el_contrato(tmp_path):
     salida = tmp_path / "res"
     run, t = correr(fuente, DetectorFalso(), cfg, "r3", salida, imprimir=lambda _: None)
     eventos = [json.loads(x) for x in (salida / "eventos.jsonl").read_text().splitlines()]
-    assert all(validar_evento(e, "H1") == [] for e in eventos)  # incluye el de error
-    assert run["contrato"] == {"documento": "docs/contrato.md", "etapa": "H1"}
+    assert all(validar_evento(e, "H3") == [] for e in eventos)  # incluye el de error
+    assert run["contrato"] == {"documento": "docs/contrato.md", "etapa": "H3"}
+    # zona y ventana: 0.90 es aceptada (igualdad con el superior), 0.40 baja, y los cuadros
+    # sin detecciones o con error no tienen zona
+    assert [e["zone"] for e in eventos] == ["aceptada", None, None, "baja"]
+    assert [e["window_id"] for e in eventos] == [1, 1, 1, 1]
+    assert run["totales"]["zonas"] == {"aceptada": 1, "duda": 0, "baja": 1}
+    (v,) = run["totales"]["ventanas"]
+    assert (v["cuadros"], v["con_detecciones"], v["sin_detecciones"], v["error"]) == (4, 2, 1, 1)
+    assert v["completa"] is False and v["suficiente"] is False
+    assert v["proporcion_baja"] == "insuficiente"  # 2 cuadros con detecciones < mínimo de 10
+    assert run["politica"]["umbral_inferior"] == cfg.confianza.umbral_inferior
     assert run["totales"]["eventos_aceptados"] == 4 and run["totales"]["eventos_rechazados"] == 0
     assert not (salida / "rechazados.jsonl").exists() and "rechazados" not in run["archivos"]
 

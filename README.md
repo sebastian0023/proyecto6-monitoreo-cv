@@ -31,6 +31,7 @@ La fuente puede ser un video, una carpeta de imágenes o la webcam (`--fuente we
 
 - [`docs/PLAN.md`](docs/PLAN.md): plan, decisiones y cronograma.
 - [`docs/contrato.md`](docs/contrato.md): campos del evento y de la alerta, y su validación.
+- [`docs/politica.md`](docs/politica.md): umbrales, zonas, ventanas y reglas de alerta, justificados con la referencia.
 - [`docs/metricas.md`](docs/metricas.md): las 7 métricas base (G1–G7), con definición, fórmula y ejemplo.
 
 Las instrucciones completas, el índice de evidencias y la autoría se cierran en #10.
