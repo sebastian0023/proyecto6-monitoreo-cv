@@ -14,3 +14,4 @@ datos/videos/originales/
 
 # Corridas locales; la evidencia de entrega se copia a evidencias/
 resultados/
+*.egg-info/

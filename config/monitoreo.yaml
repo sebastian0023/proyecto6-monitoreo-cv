@@ -1,0 +1,19 @@
+# Configuración del monitoreo. Su SHA-256 completo se guarda en run.json y en cada evento
+# (`config_sha256`). Rutas relativas a este archivo. En #5 se agregan las secciones de
+# confianza (umbrales, ventana) y en #7 las reglas de alerta.
+version: 1
+
+modelo:
+  archivo: ../modelo/yolox_nano.onnx        # se descarga con scripts/descargar_modelo.py
+  descriptor: ../modelo/descriptor.yaml     # versión, SHA-256 esperado y clases
+
+fuente:
+  ritmo_cuadros_s: 5      # cuadros por segundo que se entregan al detector
+  cuadros_warmup: 5       # primeros cuadros de la corrida; se excluyen de las métricas de tiempo
+
+detector:
+  tamano_entrada: 416     # lado del tensor cuadrado de YOLOX-Nano
+  relleno: 114            # gris del letterbox, como en el entrenamiento de YOLOX
+  piso: 0.10              # puntuación mínima que entrega el detector (P5 usaba 0.30)
+  nms_iou: 0.45           # NMS por clase; valor por defecto de YOLOX
+  max_detecciones: 100    # tope por cuadro después del NMS

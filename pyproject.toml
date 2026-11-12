@@ -1,0 +1,15 @@
+# Solo configuración de herramientas. El paquete p6 no se instala: los comandos se ejecutan
+# con `export PYTHONPATH=src` (ver README). Un `pip install -e .` deja un archivo .pth que
+# macOS marca como oculto en carpetas sincronizadas con iCloud, y Python 3.12 lo ignora.
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests", "scripts"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
