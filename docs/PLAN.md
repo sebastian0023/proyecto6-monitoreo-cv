@@ -1,5 +1,7 @@
 # Plan del Proyecto 6: centro de monitoreo de computer vision
 
+> Este es el plan inicial (10 de noviembre). Lo que se entregó, y en qué se apartó de este plan, está en el [README](../README.md#diferencias-con-el-plan) y en [`evidencias/INDICE.md`](../evidencias/INDICE.md).
+
 Entrega individual de Sebastián (@sebastian0023). **Fecha: viernes 13 de noviembre de 2026** (la hora oficial es la de Canvas, ver #2).
 Guía: `guia-proyecto-6.html` (100 puntos base y extras sin límite).
 
