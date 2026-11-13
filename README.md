@@ -102,7 +102,7 @@ Otras opciones:
 - `--sin-pausa` procesa sin esperar entre cuadros.
 - `--sobrescribir` repite una corrida con el mismo `run_id`.
 - `--fuente webcam:0` usa la cámara.
-- `--fuente <carpeta>` usa una carpeta de imágenes.
+- `--fuente <carpeta>` usa una carpeta de imágenes. Por ejemplo, `--fuente datos/carrito --run-id carrito-p5` usa las 78 fotos del carrito del Proyecto 5 (extra #13; ver [`datos/carrito/README.md`](datos/carrito/README.md)).
 
 ## Portal
 
