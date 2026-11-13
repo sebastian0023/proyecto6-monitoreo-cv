@@ -128,3 +128,17 @@ python scripts/calibrar_referencia.py --run resultados/ref-01 \
 ```
 
 `calibrar_referencia.py` lee solo la corrida de referencia, recalcula percentiles, umbrales, `p_ref` y la proporción por ventana, y falla si la configuración no coincide.
+
+## 9. Regla F · interrupción de la fuente (extra #14)
+
+Además de A y B, el monitoreo vigila que la fuente siga entregando cuadros.
+
+- **Condición:** el hueco entre dos cuadros seguidos (por su reloj monotónico, `t_mono_ms`) supera **5 intervalos esperados**, es decir, 1 s a 5 cuadros/s.
+- **Alerta:** se registra una alerta `F` de severidad `critical`.
+  - `opened_at` es el momento en que el hueco pasó el umbral: el último cuadro antes del corte más 1 s.
+  - `closed_at` es el primer cuadro que llega después, es decir, la recuperación.
+  - `event_ids` son esos dos cuadros.
+  - `reason` dice la duración del hueco, el umbral y los cuadros de origen.
+- **Dónde está:** `src/p6/alertas.py` (`DetectorInterrupciones`). No está en `config/monitoreo.yaml`, que quedó congelada en #5: es una constante del código y cada `run.json` la registra en `politica.regla_F`. Con un ritmo normal no se dispara (ni en la referencia, ni en C1, ni en C2).
+- **Simulación para el escenario:** `python -m p6.monitorear … --simular-corte N:S` hace que la fuente de video o de carpeta deje de entregar cuadros durante S segundos después del cuadro N. Luego sigue donde estaría un stream en vivo: los cuadros de ese lapso se pierden y la cadencia se reanuda sin ponerse al día. `run.json` → `fuente.simulacion_corte` registra lo que ocurrió.
+- **Límite:** la interrupción se detecta y se registra cuando la fuente se recupera. Un corte definitivo termina la corrida: el video se acaba o la cámara da error.

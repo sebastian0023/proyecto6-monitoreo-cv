@@ -24,6 +24,7 @@ ventanas donde se cumplió la condición; `window_ids` son esas ventanas.
 
 from __future__ import annotations
 
+from datetime import datetime, timedelta
 from typing import Any
 
 from p6.config import Config
@@ -185,3 +186,65 @@ class EvaluadorReglas:
         if problemas:  # sería un error de programa, no de los datos
             raise ValueError(f"alerta {publica['alert_id']} no cumple el contrato: {problemas}")
         return publica
+
+
+# ---- regla F · interrupción de la fuente (extra, #14) -----------------------------------
+# No está en config/monitoreo.yaml (congelada en #5): es una constante del código y cada
+# run.json la registra. Un hueco entre dos cuadros seguidos mayor que 5 intervalos
+# esperados (1 s a 5 cuadros/s) es una interrupción de la fuente.
+INTERVALOS_SIN_CUADROS = 5
+ACCION_F = "Revisar la cámara o la conexión de la fuente; los cuadros de ese lapso no se procesaron"
+
+
+def umbral_sin_cuadros_s(ritmo: float) -> float:
+    return INTERVALOS_SIN_CUADROS / ritmo
+
+
+class DetectorInterrupciones:
+    """Compara el reloj monotónico de cada cuadro con el anterior. Si el hueco supera el
+    umbral, devuelve una alerta F ya cerrada: se abrió cuando el hueco pasó el umbral y se
+    cerró con el primer cuadro que llegó después (la recuperación)."""
+
+    def __init__(self, cfg: Config, run_id: str, ritmo: float) -> None:
+        self.cfg = cfg
+        self.run_id = run_id
+        self.intervalo_s = 1.0 / ritmo
+        self.umbral_s = umbral_sin_cuadros_s(ritmo)
+        self.anterior: dict[str, Any] | None = None
+        self.contador = 0
+
+    def __call__(self, evento: dict[str, Any]) -> dict[str, Any] | None:
+        anterior, self.anterior = self.anterior, evento
+        if anterior is None:
+            return None
+        hueco_s = (evento["t_mono_ms"] - anterior["t_mono_ms"]) / 1000
+        if hueco_s <= self.umbral_s:
+            return None
+        self.contador += 1
+        abre = datetime.fromisoformat(anterior["t_capture_utc"]) + timedelta(seconds=self.umbral_s)
+        ventanas = sorted({anterior["window_id"], evento["window_id"]})
+        alerta = {
+            "alert_id": f"{self.run_id}-F-{self.contador}",
+            "rule_id": "F",
+            "run_id": self.run_id,
+            "status": "cerrada",
+            "opened_at": abre.isoformat(timespec="milliseconds"),
+            "opened_window_id": anterior["window_id"],
+            "closed_at": evento["t_capture_utc"],
+            "closed_window_id": evento["window_id"],
+            "severity": "critical",
+            "reason": (
+                f"sin cuadros de la fuente durante {hueco_s:.2f} s entre {anterior['event_id']} "
+                f"({anterior['origen']}) y {evento['event_id']} ({evento['origen']}); se espera "
+                f"un cuadro cada {self.intervalo_s:.2f} s y el umbral es {self.umbral_s:.2f} s; "
+                f"la fuente se recuperó con {evento['event_id']}"
+            ),
+            "window_ids": ventanas,
+            "event_ids": [anterior["event_id"], evento["event_id"]],
+            "config_sha256": self.cfg.sha256,
+            "suggested_action": ACCION_F,
+        }
+        problemas = validar_alerta(alerta)
+        if problemas:
+            raise ValueError(f"alerta {alerta['alert_id']} no cumple el contrato: {problemas}")
+        return alerta

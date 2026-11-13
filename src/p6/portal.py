@@ -386,8 +386,8 @@ def crear_app(ruta_db: Path | str) -> FastAPI:
             raise HTTPException(
                 400, f"estado de alerta desconocido {status!r}; usa {ESTADOS_ALERTA}"
             )
-        if f["rule_id"] is not None and f["rule_id"] not in ("A", "B"):
-            raise HTTPException(400, f"regla desconocida {regla!r}; usa A o B")
+        if f["rule_id"] is not None and f["rule_id"] not in ("A", "B", "F"):
+            raise HTTPException(400, f"regla desconocida {regla!r}; usa A, B o F")
         return f
 
     def _reglas(db: Almacen, run_id: str) -> dict[str, dict[str, Any]]:

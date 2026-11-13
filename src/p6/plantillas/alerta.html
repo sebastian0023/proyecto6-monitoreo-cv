@@ -4,7 +4,7 @@
 {% block contenido %}
 <p class="sub"><a href="/alertas">Alertas</a> · <a href="/corridas/{{ a.run_id }}">Corrida {{ a.run_id }}</a></p>
 <h1 class="mono">{{ a.alert_id }}</h1>
-<p class="sub">Regla {{ a.rule_id }}{% if regla.nombre %} · {{ regla.nombre }}{% endif %}</p>
+<p class="sub">Regla {{ a.rule_id }}{% if regla.nombre %} · {{ regla.nombre }}{% elif a.rule_id == 'F' %} · interrupción de la fuente{% endif %}</p>
 
 <div class="grid">
   <div class="dato"><div class="k">Severidad</div><div class="v">{{ m.severidad(a.severity) }}</div></div>
@@ -22,6 +22,8 @@
 <div class="panel"><dl class="campos">
   {% if a.rule_id == 'A' %}
   <dt>Condición</dt><dd>En una ventana con evidencia suficiente, la proporción de cuadros en zona baja es ≥ {{ regla.proporcion_minima }}</dd>
+  {% elif a.rule_id == 'F' %}
+  <dt>Condición</dt><dd>Pasan más de {{ politica.regla_F.umbral_s if politica.regla_F else 1.0 }} s sin cuadros de la fuente (5 intervalos esperados). Se abre cuando el hueco supera el umbral y se cierra con el primer cuadro que llega después. Regla del código (extra #14), no de config/monitoreo.yaml</dd>
   {% else %}
   <dt>Condición</dt><dd>La proporción de cuadros en zona baja supera p_ref + {{ regla.margen_sobre_referencia }}{% if politica.regla_B %} = {{ politica.regla_B.limite }}{% endif %} en {{ regla.ventanas_seguidas }} ventanas suficientes seguidas</dd>
   {% endif %}
@@ -50,7 +52,7 @@
 </div>
 
 <h2>Eventos que la explican ({{ eventos|length }})</h2>
-<p class="sub">Los cuadros en zona baja de esas ventanas, con su captura.</p>
+<p class="sub">{% if a.rule_id == 'F' %}El último cuadro antes del corte y el primero después.{% else %}Los cuadros en zona baja de esas ventanas, con su captura.{% endif %}</p>
 <div class="tabla-scroll">
 <table>
   <thead><tr><th>Evento</th><th class="num">Cuadro</th><th class="num">Ventana</th><th>Zona</th><th class="num">frame_score</th><th>Captura</th></tr></thead>

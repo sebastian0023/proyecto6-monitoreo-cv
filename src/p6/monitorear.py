@@ -40,7 +40,7 @@ import numpy as np
 import psutil
 
 from p6 import capturas
-from p6.alertas import EvaluadorReglas
+from p6.alertas import DetectorInterrupciones, EvaluadorReglas, umbral_sin_cuadros_s
 from p6.almacen import Almacen, AlmacenError
 from p6.config import Config, ConfigError, cargar_config
 from p6.contrato import ValidadorEventos
@@ -261,6 +261,12 @@ def _correr(
                 "proporcion_minima": cfg.regla_a.proporcion_minima,
                 "severidad": cfg.regla_a.severidad,
             },
+            "regla_F": {
+                "condicion": "hueco entre cuadros seguidos mayor que 5 intervalos esperados",
+                "umbral_s": round(umbral_sin_cuadros_s(fuente.ritmo), 3),
+                "severidad": "critical",
+                "nota": "extra #14; constante del código, no está en config/monitoreo.yaml",
+            },
             "regla_B": {
                 "condicion": "proporción baja > p_ref + margen en N ventanas suficientes seguidas",
                 "limite": round(cfg.referencia.p_ref + cfg.regla_b.margen_sobre_referencia, 4),
@@ -348,6 +354,7 @@ def _correr(
                 }
         pendientes.clear()
 
+    interrupciones = DetectorInterrupciones(cfg, run_id, fuente.ritmo)
     error_fuente: FuenteError | None = None
     try:
         for cuadro in fuente.cuadros():
@@ -362,6 +369,20 @@ def _correr(
             evento = _evento(run_id, cuadro, fuente, detector, cfg, proceso, resultado, error)
             totales.cuadros += 1
             imprimir(_linea(evento))
+            corte = interrupciones(evento)
+            if corte is not None:
+                db.guardar_alertas([corte])
+                totales.alertas[corte["alert_id"]] = {
+                    k: corte[k]
+                    for k in (
+                        "rule_id",
+                        "severity",
+                        "status",
+                        "opened_window_id",
+                        "closed_window_id",
+                    )
+                }
+                imprimir(f"ALERTA {corte['alert_id']} ({corte['severity']}): {corte['reason']}")
             if pendientes and pendientes[0][0]["window_id"] != evento["window_id"]:
                 cerrar_ventana()
             pendientes.append((evento, cuadro.imagen))
@@ -382,6 +403,7 @@ def _correr(
         run["archivos"]["rechazados"] = "rechazados.jsonl"
     fin = datetime.now(UTC)
     duracion = (fin - inicio).total_seconds()
+    run["fuente"] = fuente.descripcion()  # incluye el corte simulado, si ocurrió
     run["fin_utc"] = fin.isoformat(timespec="seconds")
     run["totales"] = {
         "cuadros": totales.cuadros,
@@ -447,6 +469,12 @@ def _parser() -> argparse.ArgumentParser:
     p.add_argument("--sin-pausa", action="store_true", help="no esperar entre cuadros (pruebas)")
     p.add_argument("--max-cuadros", type=int, default=None, help="detenerse tras N cuadros")
     p.add_argument("--sobrescribir", action="store_true", help="reemplazar una corrida existente")
+    p.add_argument(
+        "--simular-corte",
+        default=None,
+        metavar="N:S",
+        help="la fuente deja de entregar cuadros S segundos después del cuadro N (extra #14)",
+    )
     return p
 
 
@@ -469,7 +497,16 @@ def main(argv: list[str] | None = None) -> int:
             almacen.cerrar()
             raise ConfigError(f"la corrida {run_id} ya existe; usa otro --run-id o --sobrescribir")
         detector = DetectorONNX.desde_config(cfg)
-        fuente = abrir_fuente(args.fuente, ritmo, sin_pausa=args.sin_pausa)
+        corte = None
+        if args.simular_corte:
+            n, _, s = args.simular_corte.partition(":")
+            try:
+                corte = (int(n), float(s))
+            except ValueError as exc:
+                raise ConfigError("--simular-corte debe ser N:S, por ejemplo 70:6") from exc
+            if corte[0] < 1 or corte[1] <= 0:
+                raise ConfigError("--simular-corte necesita N ≥ 1 y S > 0")
+        fuente = abrir_fuente(args.fuente, ritmo, sin_pausa=args.sin_pausa, corte=corte)
     except (ConfigError, ModeloInvalidoError, FuenteError, AlmacenError) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         if "almacen" in locals():

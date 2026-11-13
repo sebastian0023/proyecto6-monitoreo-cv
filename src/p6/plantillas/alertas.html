@@ -21,7 +21,7 @@
   <label>Regla
     <select name="regla">
       <option value="">todas</option>
-      {% for r in ['A', 'B'] %}<option value="{{ r }}" {{ 'selected' if filtros.rule_id == r }}>{{ r }}</option>{% endfor %}
+      {% for r in ['A', 'B', 'F'] %}<option value="{{ r }}" {{ 'selected' if filtros.rule_id == r }}>{{ r }}</option>{% endfor %}
     </select>
   </label>
   <button type="submit">Filtrar</button>
@@ -39,7 +39,7 @@
     <tr>
       <td class="mono nowrap"><a href="/alertas/{{ a.alert_id }}">{{ a.alert_id }}</a></td>
       <td><a href="/corridas/{{ a.run_id }}">{{ a.run_id }}</a></td>
-      <td>{{ a.rule_id }}{% if r.nombre %} · {{ r.nombre }}{% endif %}</td>
+      <td>{{ a.rule_id }}{% if r.nombre %} · {{ r.nombre }}{% elif a.rule_id == 'F' %} · interrupción de la fuente{% endif %}</td>
       <td>{{ m.severidad(a.severity) }}</td>
       <td>{{ m.estado_alerta(a.status) }}</td>
       <td class="nowrap"><span class="mono">{{ a.opened_at[:10] }}<br>{{ a.opened_at[11:23] }}</span><br><small>ventana {{ a.opened_window_id }}</small></td>
