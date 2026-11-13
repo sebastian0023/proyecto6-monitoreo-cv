@@ -7,6 +7,7 @@ Solo lee la base de datos (modo de solo lectura) y los archivos de captura; no m
 Páginas:
 
 - `/eventos`: lista con filtros por corrida, estado, zona, ventana y captura.
+- `/eventos.csv`: los eventos filtrados (todos, sin paginar) en CSV.
 - `/eventos/{event_id}`: detecciones, zona, ventana, captura (verificada por SHA-256) y
   enlaces a la configuración y a la corrida.
 - `/capturas/{event_id}`: el JPEG, solo si existe y su SHA-256 coincide con el del evento.
@@ -22,7 +23,10 @@ Páginas:
 from __future__ import annotations
 
 import argparse
+import csv
 import hashlib
+import io
+import json
 import sys
 from pathlib import Path
 from typing import Any
@@ -30,7 +34,13 @@ from urllib.parse import urlencode
 
 import yaml
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse
+from fastapi.responses import (
+    FileResponse,
+    HTMLResponse,
+    JSONResponse,
+    RedirectResponse,
+    Response,
+)
 from fastapi.templating import Jinja2Templates
 from PIL import Image
 
@@ -39,6 +49,59 @@ from p6.almacen import Almacen, AlmacenError
 from p6.contrato import ESTADOS, ESTADOS_ALERTA, ZONAS
 
 POR_PAGINA = 50
+# Columnas del CSV de eventos: los campos del contrato, en lista plana, más un resumen de las
+# detecciones y el estado verificado de la captura.
+COLUMNAS_CSV = (
+    "event_id",
+    "run_id",
+    "frame_id",
+    "t_capture_utc",
+    "source_id",
+    "origen",
+    "status",
+    "error_msg",
+    "frame_score",
+    "zone",
+    "window_id",
+    "n_detecciones",
+    "mejor_clase",
+    "mejor_score",
+    "detections",
+    "t_pre_ms",
+    "t_infer_ms",
+    "t_post_ms",
+    "rss_mb",
+    "warmup",
+    "model_version",
+    "model_sha256",
+    "config_sha256",
+    "image_ref",
+    "image_sha256",
+    "image_reason",
+    "captura",
+)
+
+
+def eventos_a_csv(eventos: list[dict[str, Any]]) -> str:
+    """CSV con encabezado; una fila por evento. Sin eventos, solo el encabezado."""
+    salida = io.StringIO()
+    w = csv.writer(salida, lineterminator="\n")
+    w.writerow(COLUMNAS_CSV)
+    for e in eventos:
+        mejor = e["detections"][0] if e["detections"] else None
+        fila = {
+            **e,
+            "n_detecciones": len(e["detections"]),
+            "mejor_clase": mejor["class_name"] if mejor else None,
+            "mejor_score": mejor["score"] if mejor else None,
+            "detections": json.dumps(e["detections"], ensure_ascii=False),
+            "warmup": "true" if e["warmup"] else "false",
+            "captura": e.get("_captura"),
+        }
+        w.writerow(["" if fila.get(c) is None else fila[c] for c in COLUMNAS_CSV])
+    return salida.getvalue()
+
+
 PLANTILLAS = Path(__file__).resolve().parent / "plantillas"
 
 ESTADO_CAPTURA = {
@@ -177,6 +240,7 @@ def crear_app(ruta_db: Path | str) -> FastAPI:
             if v
         }
         enlace = lambda n: "/eventos?" + urlencode({**consulta, "pagina": n})  # noqa: E731
+        csv_url = "/eventos.csv" + ("?" + urlencode(consulta) if consulta else "")
         return render(
             request,
             "eventos.html",
@@ -187,10 +251,50 @@ def crear_app(ruta_db: Path | str) -> FastAPI:
                 "corridas": corridas,
                 "estados": ESTADOS,
                 "zonas": ZONAS,
+                "csv_url": csv_url,
                 "pagina_actual": filtros["pagina"],
                 "paginas": paginas,
                 "anterior": enlace(filtros["pagina"] - 1) if filtros["pagina"] > 1 else None,
                 "siguiente": enlace(filtros["pagina"] + 1) if filtros["pagina"] < paginas else None,
+            },
+        )
+
+    @app.get("/eventos.csv")
+    def eventos_csv(
+        run_id: str | None = None,
+        status: str | None = None,
+        zone: str | None = None,
+        ventana: str | None = None,
+        captura: str | None = None,
+    ) -> Response:
+        """Todos los eventos que cumplen los filtros (sin paginar), en CSV."""
+        try:
+            filtros = _leer_filtros(run_id, status, zone, ventana, captura, None)
+        except FiltroInvalido as exc:
+            raise HTTPException(400, str(exc)) from exc
+        with abrir() as db:
+            args = {k: filtros[k] for k in ("run_id", "status", "zone", "window_id", "con_captura")}
+            eventos = db.eventos(**args)
+            carpetas: dict[str, Path] = {}
+            for e in eventos:
+                e["_captura"] = estado_captura(db, e, carpetas)
+        partes = [run_id or "todas"] + [
+            f"{k}-{v}"
+            for k, v in (
+                ("status", status),
+                ("zona", zone),
+                ("ventana", ventana),
+                ("captura", captura),
+            )
+            if v
+        ]
+        nombre = "eventos_" + "_".join(partes) + ".csv"
+        return Response(
+            "\ufeff" + eventos_a_csv(eventos),  # BOM: Excel reconoce el UTF-8
+            media_type="text/csv; charset=utf-8",
+            headers={
+                "Content-Disposition": f'attachment; filename="{nombre}"',
+                "X-Total-Eventos": str(len(eventos)),
             },
         )
 

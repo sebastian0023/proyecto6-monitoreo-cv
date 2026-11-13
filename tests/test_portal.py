@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import re
 
 import pytest
@@ -131,3 +132,57 @@ def test_lo_que_no_existe_da_404(entorno):
 def test_sin_base_de_datos_responde_503(tmp_path):
     cliente = TestClient(portal.crear_app(tmp_path / "no.db"))
     assert cliente.get("/eventos").status_code == 503
+
+
+def _csv(respuesta):
+    import csv
+    import io
+
+    assert respuesta.status_code == 200
+    assert respuesta.headers["content-type"].startswith("text/csv")
+    texto = respuesta.content.decode("utf-8")
+    assert texto.startswith("﻿")  # BOM para Excel
+    return list(csv.DictReader(io.StringIO(texto[1:])))
+
+
+def test_csv_exporta_los_eventos_filtrados_igual_que_la_base(entorno):
+    cliente, salida, _ = entorno
+    filas = _csv(cliente.get("/eventos.csv?run_id=p1"))
+    with Almacen(salida.parent / "monitoreo.db", solo_lectura=True) as db:
+        eventos = db.eventos(run_id="p1")
+    assert [f["event_id"] for f in filas] == [e["event_id"] for e in eventos]
+    for f, e in zip(filas, eventos, strict=True):
+        assert f["status"] == e["status"] and f["zone"] == (e["zone"] or "")
+        assert f["frame_score"] == ("" if e["frame_score"] is None else str(e["frame_score"]))
+        assert json.loads(f["detections"]) == e["detections"]
+        assert f["n_detecciones"] == str(len(e["detections"]))
+        assert f["image_sha256"] == (e["image_sha256"] or "")
+        assert f["config_sha256"] == e["config_sha256"]
+    assert [f["captura"] for f in filas] == [
+        "ok",
+        "sin_captura",
+        "sin_captura",
+        "ok",
+        "sin_captura",
+    ]
+    assert filas[0]["mejor_clase"] == "person" and filas[1]["mejor_clase"] == ""
+
+
+def test_csv_respeta_los_filtros_y_el_caso_sin_resultados(entorno):
+    cliente, salida, _ = entorno
+    r = cliente.get("/eventos.csv?run_id=p1&zone=baja")
+    assert [f["event_id"] for f in _csv(r)] == ["p1-4"]
+    assert r.headers["x-total-eventos"] == "1"
+    assert 'filename="eventos_p1_zona-baja.csv"' in r.headers["content-disposition"]
+    vacio = cliente.get("/eventos.csv?run_id=otra")
+    assert _csv(vacio) == [] and vacio.headers["x-total-eventos"] == "0"
+    assert vacio.content.decode("utf-8").strip("﻿").startswith("event_id,run_id,frame_id")
+    assert cliente.get("/eventos.csv?zone=rara").status_code == 400
+    # la lista ofrece la descarga con los mismos filtros
+    assert (
+        'href="/eventos.csv?run_id=p1&amp;zone=baja"'
+        in cliente.get("/eventos?run_id=p1&zone=baja").text
+    )
+    # una captura rota se informa en el CSV
+    (salida / "capturas" / "p1-4.jpg").unlink()
+    assert _csv(cliente.get("/eventos.csv?zone=baja"))[0]["captura"] == "no_existe"

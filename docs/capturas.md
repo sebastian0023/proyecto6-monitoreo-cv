@@ -65,6 +65,7 @@ Solo lee: abre la base en modo de solo lectura y no modifica archivos.
 |---|---|
 | `/eventos` | Lista paginada (50 por página) con filtros por corrida, estado, zona (incluida «sin zona»), ventana y captura. Cada fila enlaza al detalle, a la corrida y a su ventana, e indica si la captura está verificada, falta o está rota |
 | `/eventos/{event_id}` | Estado, zona, `frame_score`, ventana, la captura con las cajas de las detecciones (si está verificada), la tabla de detecciones, las alertas que incluyen el evento y la trazabilidad: fuente, momento, modelo, **enlace a la configuración**, tiempos y RAM. Enlaces al cuadro anterior y siguiente |
+| `/eventos.csv` | Extra (#12): los eventos que cumplen los filtros de la lista, **todos** (sin paginar), en CSV UTF-8 con BOM. Una fila por evento con los campos del contrato, un resumen de las detecciones (`n_detecciones`, `mejor_clase`, `mejor_score`, `detections` en JSON) y el estado verificado de la captura (`captura`). Sin resultados devuelve solo el encabezado. Botón «Descargar CSV» en `/eventos` |
 | `/capturas/{event_id}` | El JPEG, solo si existe y su SHA-256 coincide |
 | `/configuracion/{sha256}` | El texto completo de la configuración que produjo los eventos, con su SHA-256 recalculado y comprobado, y las corridas que la usaron |
 | `/corridas`, `/corridas/{run_id}` | Corridas con su fuente, modelo y configuración; por corrida, el conteo por zona, las capturas, el resumen por ventana con enlaces y el `run.json` completo |

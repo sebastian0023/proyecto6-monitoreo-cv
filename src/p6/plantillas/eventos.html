@@ -37,6 +37,7 @@
   </label>
   <button type="submit">Filtrar</button>
   <a href="/eventos">Quitar filtros</a>
+  <a href="{{ csv_url }}" download>Descargar CSV ({{ total }} evento{{ '' if total == 1 else 's' }})</a>
 </form>
 
 {% if eventos %}
