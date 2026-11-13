@@ -1,0 +1,234 @@
+{
+  "run_id": "c3-interrupcion",
+  "inicio_utc": "2026-11-13T00:25:55+00:00",
+  "fin_utc": "2026-11-13T00:26:24+00:00",
+  "fuente": {
+    "source_id": "video:normal.mp4",
+    "source_kind": "video",
+    "ruta": "datos/videos/normal.mp4",
+    "ritmo_declarado_cuadros_s": 5.0,
+    "sin_pausa": false,
+    "muestreo": {
+      "metodo": "1 de cada k cuadros del video",
+      "k": 3,
+      "fps_video": 15.0,
+      "cuadros_video": 440,
+      "ritmo_equivalente_cuadros_s": 5.0
+    },
+    "simulacion_corte": {
+      "despues_del_cuadro": 70,
+      "segundos": 6.0,
+      "ocurrio": {
+        "despues_del_cuadro": 70,
+        "segundos": 6.0,
+        "elementos_omitidos": 90,
+        "t_mono_inicio_ms": 2361807712.976,
+        "t_mono_fin_ms": 2361813716.072
+      }
+    }
+  },
+  "modelo": {
+    "nombre": "yolox_nano",
+    "version": "0.1.1rc0",
+    "sha256": "c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d",
+    "tarea": "detection",
+    "archivo": "/Users/danielsebastianmaciasmacias/Documents/proyecto6-monitoreo-cv/config/../modelo/yolox_nano.onnx",
+    "descriptor": "/Users/danielsebastianmaciasmacias/Documents/proyecto6-monitoreo-cv/config/../modelo/descriptor.yaml",
+    "piso_puntuacion": 0.1
+  },
+  "configuracion": {
+    "archivo": "config/monitoreo.yaml",
+    "sha256": "11b0625330078e09f04f6d8c45efe9e09997a28d34afbaf07a75978e4b500a3f"
+  },
+  "entorno": {
+    "so": "macOS-26.6.2-arm64-arm-64bit",
+    "python": "3.12.13",
+    "onnxruntime": "1.30.0",
+    "opencv": "5.0.0",
+    "numpy": "2.5.4",
+    "git_commit": "3dc1c44df3fe164fc1370f15bf4725d5aa78ccde",
+    "git_arbol_con_cambios": false
+  },
+  "cuadros_warmup": 5,
+  "contrato": {
+    "documento": "docs/contrato.md",
+    "etapa": "H4"
+  },
+  "politica": {
+    "documento": "docs/politica.md",
+    "umbral_inferior": 0.85,
+    "umbral_superior": 0.9,
+    "ventana_cuadros": 20,
+    "minimo_con_detecciones": 10,
+    "referencia_run_id": "ref-01",
+    "p_ref": 0.0204,
+    "regla_A": {
+      "condicion": "proporción baja >= proporcion_minima en una ventana suficiente",
+      "proporcion_minima": 0.5,
+      "severidad": "warning"
+    },
+    "regla_F": {
+      "condicion": "hueco entre cuadros seguidos mayor que 5 intervalos esperados",
+      "umbral_s": 1.0,
+      "severidad": "critical",
+      "nota": "extra #14; constante del código, no está en config/monitoreo.yaml"
+    },
+    "regla_B": {
+      "condicion": "proporción baja > p_ref + margen en N ventanas suficientes seguidas",
+      "limite": 0.2204,
+      "ventanas_seguidas": 3,
+      "severidad": "critical"
+    }
+  },
+  "politica_capturas": {
+    "documento": "docs/capturas.md",
+    "motivos": {
+      "baja": "todo cuadro en zona baja",
+      "ventana_alerta": "todos los cuadros de una ventana que abrió una alerta",
+      "muestra": "1 de cada 20 cuadros (frame_id % 20 == 1)"
+    },
+    "formato": "JPEG calidad 90",
+    "carpeta": "capturas/<event_id>.jpg",
+    "caducidad": "ninguna"
+  },
+  "archivos": {
+    "eventos": "eventos.jsonl",
+    "alertas": "alertas.jsonl",
+    "capturas": "capturas/",
+    "base_de_datos": "../monitoreo.db",
+    "metricas": "metricas.json"
+  },
+  "totales": {
+    "cuadros": 117,
+    "ok": 117,
+    "sin_detecciones": 0,
+    "error": 0,
+    "interrumpida": false,
+    "eventos_aceptados": 117,
+    "eventos_rechazados": 0,
+    "motivos_rechazo": {},
+    "frame_score": {
+      "n": 117,
+      "min": 0.8925,
+      "p10": 0.8987,
+      "p50": 0.907,
+      "p90": 0.9173,
+      "max": 0.9234
+    },
+    "zonas": {
+      "aceptada": 99,
+      "duda": 18,
+      "baja": 0
+    },
+    "capturas": {
+      "baja": 0,
+      "ventana_alerta": 0,
+      "muestra": 6,
+      "total": 6
+    },
+    "alertas": 1,
+    "alertas_detalle": {
+      "c3-interrupcion-F-1": {
+        "rule_id": "F",
+        "severity": "critical",
+        "status": "cerrada",
+        "opened_window_id": 4,
+        "closed_window_id": 4
+      }
+    },
+    "ventanas": [
+      {
+        "window_id": 1,
+        "cuadros": 20,
+        "completa": true,
+        "con_detecciones": 20,
+        "sin_detecciones": 0,
+        "error": 0,
+        "aceptada": 10,
+        "duda": 10,
+        "baja": 0,
+        "suficiente": true,
+        "proporcion_baja": 0.0,
+        "event_id_desde": "c3-interrupcion-1",
+        "event_id_hasta": "c3-interrupcion-20"
+      },
+      {
+        "window_id": 2,
+        "cuadros": 20,
+        "completa": true,
+        "con_detecciones": 20,
+        "sin_detecciones": 0,
+        "error": 0,
+        "aceptada": 19,
+        "duda": 1,
+        "baja": 0,
+        "suficiente": true,
+        "proporcion_baja": 0.0,
+        "event_id_desde": "c3-interrupcion-21",
+        "event_id_hasta": "c3-interrupcion-40"
+      },
+      {
+        "window_id": 3,
+        "cuadros": 20,
+        "completa": true,
+        "con_detecciones": 20,
+        "sin_detecciones": 0,
+        "error": 0,
+        "aceptada": 16,
+        "duda": 4,
+        "baja": 0,
+        "suficiente": true,
+        "proporcion_baja": 0.0,
+        "event_id_desde": "c3-interrupcion-41",
+        "event_id_hasta": "c3-interrupcion-60"
+      },
+      {
+        "window_id": 4,
+        "cuadros": 20,
+        "completa": true,
+        "con_detecciones": 20,
+        "sin_detecciones": 0,
+        "error": 0,
+        "aceptada": 19,
+        "duda": 1,
+        "baja": 0,
+        "suficiente": true,
+        "proporcion_baja": 0.0,
+        "event_id_desde": "c3-interrupcion-61",
+        "event_id_hasta": "c3-interrupcion-80"
+      },
+      {
+        "window_id": 5,
+        "cuadros": 20,
+        "completa": true,
+        "con_detecciones": 20,
+        "sin_detecciones": 0,
+        "error": 0,
+        "aceptada": 20,
+        "duda": 0,
+        "baja": 0,
+        "suficiente": true,
+        "proporcion_baja": 0.0,
+        "event_id_desde": "c3-interrupcion-81",
+        "event_id_hasta": "c3-interrupcion-100"
+      },
+      {
+        "window_id": 6,
+        "cuadros": 17,
+        "completa": false,
+        "con_detecciones": 17,
+        "sin_detecciones": 0,
+        "error": 0,
+        "aceptada": 15,
+        "duda": 2,
+        "baja": 0,
+        "suficiente": true,
+        "proporcion_baja": 0.0,
+        "event_id_desde": "c3-interrupcion-101",
+        "event_id_hasta": "c3-interrupcion-117"
+      }
+    ],
+    "duracion_s": 29.26,
+    "cuadros_por_s_medido": 3.999
+  }
+}

@@ -1,0 +1,198 @@
+{
+  "run_id": "carrito-p5",
+  "inicio_utc": "2026-11-13T00:26:24+00:00",
+  "fin_utc": "2026-11-13T00:26:40+00:00",
+  "fuente": {
+    "source_id": "carpeta:carrito",
+    "source_kind": "carpeta",
+    "ruta": "datos/carrito",
+    "ritmo_declarado_cuadros_s": 5.0,
+    "sin_pausa": false,
+    "muestreo": {
+      "metodo": "una imagen por cuadro, en orden alfabético",
+      "k": 1
+    },
+    "imagenes": 78
+  },
+  "modelo": {
+    "nombre": "yolox_nano",
+    "version": "0.1.1rc0",
+    "sha256": "c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d",
+    "tarea": "detection",
+    "archivo": "/Users/danielsebastianmaciasmacias/Documents/proyecto6-monitoreo-cv/config/../modelo/yolox_nano.onnx",
+    "descriptor": "/Users/danielsebastianmaciasmacias/Documents/proyecto6-monitoreo-cv/config/../modelo/descriptor.yaml",
+    "piso_puntuacion": 0.1
+  },
+  "configuracion": {
+    "archivo": "config/monitoreo.yaml",
+    "sha256": "11b0625330078e09f04f6d8c45efe9e09997a28d34afbaf07a75978e4b500a3f"
+  },
+  "entorno": {
+    "so": "macOS-26.6.2-arm64-arm-64bit",
+    "python": "3.12.13",
+    "onnxruntime": "1.30.0",
+    "opencv": "5.0.0",
+    "numpy": "2.5.4",
+    "git_commit": "3dc1c44df3fe164fc1370f15bf4725d5aa78ccde",
+    "git_arbol_con_cambios": false
+  },
+  "cuadros_warmup": 5,
+  "contrato": {
+    "documento": "docs/contrato.md",
+    "etapa": "H4"
+  },
+  "politica": {
+    "documento": "docs/politica.md",
+    "umbral_inferior": 0.85,
+    "umbral_superior": 0.9,
+    "ventana_cuadros": 20,
+    "minimo_con_detecciones": 10,
+    "referencia_run_id": "ref-01",
+    "p_ref": 0.0204,
+    "regla_A": {
+      "condicion": "proporción baja >= proporcion_minima en una ventana suficiente",
+      "proporcion_minima": 0.5,
+      "severidad": "warning"
+    },
+    "regla_F": {
+      "condicion": "hueco entre cuadros seguidos mayor que 5 intervalos esperados",
+      "umbral_s": 1.0,
+      "severidad": "critical",
+      "nota": "extra #14; constante del código, no está en config/monitoreo.yaml"
+    },
+    "regla_B": {
+      "condicion": "proporción baja > p_ref + margen en N ventanas suficientes seguidas",
+      "limite": 0.2204,
+      "ventanas_seguidas": 3,
+      "severidad": "critical"
+    }
+  },
+  "politica_capturas": {
+    "documento": "docs/capturas.md",
+    "motivos": {
+      "baja": "todo cuadro en zona baja",
+      "ventana_alerta": "todos los cuadros de una ventana que abrió una alerta",
+      "muestra": "1 de cada 20 cuadros (frame_id % 20 == 1)"
+    },
+    "formato": "JPEG calidad 90",
+    "carpeta": "capturas/<event_id>.jpg",
+    "caducidad": "ninguna"
+  },
+  "archivos": {
+    "eventos": "eventos.jsonl",
+    "alertas": "alertas.jsonl",
+    "capturas": "capturas/",
+    "base_de_datos": "../monitoreo.db",
+    "metricas": "metricas.json"
+  },
+  "totales": {
+    "cuadros": 78,
+    "ok": 62,
+    "sin_detecciones": 16,
+    "error": 0,
+    "interrumpida": false,
+    "eventos_aceptados": 78,
+    "eventos_rechazados": 0,
+    "motivos_rechazo": {},
+    "frame_score": {
+      "n": 62,
+      "min": 0.1487,
+      "p10": 0.2103,
+      "p50": 0.5034,
+      "p90": 0.8742,
+      "max": 0.9078
+    },
+    "zonas": {
+      "aceptada": 1,
+      "duda": 13,
+      "baja": 48
+    },
+    "capturas": {
+      "baja": 48,
+      "ventana_alerta": 12,
+      "muestra": 2,
+      "total": 62
+    },
+    "alertas": 2,
+    "alertas_detalle": {
+      "carrito-p5-A-1": {
+        "rule_id": "A",
+        "severity": "warning",
+        "status": "abierta",
+        "opened_window_id": 2,
+        "closed_window_id": null
+      },
+      "carrito-p5-B-1": {
+        "rule_id": "B",
+        "severity": "critical",
+        "status": "abierta",
+        "opened_window_id": 4,
+        "closed_window_id": null
+      }
+    },
+    "ventanas": [
+      {
+        "window_id": 1,
+        "cuadros": 20,
+        "completa": true,
+        "con_detecciones": 9,
+        "sin_detecciones": 11,
+        "error": 0,
+        "aceptada": 0,
+        "duda": 2,
+        "baja": 7,
+        "suficiente": false,
+        "proporcion_baja": "insuficiente",
+        "event_id_desde": "carrito-p5-1",
+        "event_id_hasta": "carrito-p5-20"
+      },
+      {
+        "window_id": 2,
+        "cuadros": 20,
+        "completa": true,
+        "con_detecciones": 18,
+        "sin_detecciones": 2,
+        "error": 0,
+        "aceptada": 1,
+        "duda": 1,
+        "baja": 16,
+        "suficiente": true,
+        "proporcion_baja": 0.8889,
+        "event_id_desde": "carrito-p5-21",
+        "event_id_hasta": "carrito-p5-40"
+      },
+      {
+        "window_id": 3,
+        "cuadros": 20,
+        "completa": true,
+        "con_detecciones": 20,
+        "sin_detecciones": 0,
+        "error": 0,
+        "aceptada": 0,
+        "duda": 5,
+        "baja": 15,
+        "suficiente": true,
+        "proporcion_baja": 0.75,
+        "event_id_desde": "carrito-p5-41",
+        "event_id_hasta": "carrito-p5-60"
+      },
+      {
+        "window_id": 4,
+        "cuadros": 18,
+        "completa": false,
+        "con_detecciones": 15,
+        "sin_detecciones": 3,
+        "error": 0,
+        "aceptada": 0,
+        "duda": 5,
+        "baja": 10,
+        "suficiente": true,
+        "proporcion_baja": 0.6667,
+        "event_id_desde": "carrito-p5-61",
+        "event_id_hasta": "carrito-p5-78"
+      }
+    ],
+    "duracion_s": 15.488,
+    "cuadros_por_s_medido": 5.036
+  }
+}

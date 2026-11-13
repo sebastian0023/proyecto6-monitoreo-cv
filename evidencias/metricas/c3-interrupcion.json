@@ -1,0 +1,1320 @@
+{
+  "run_id": "c3-interrupcion",
+  "documento": "docs/metricas.md",
+  "corrida": {
+    "cuadros": 117,
+    "window_ids": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "event_id_desde": "c3-interrupcion-1",
+    "event_id_hasta": "c3-interrupcion-117",
+    "G1": {
+      "metrica": "latencia_inferencia_ms",
+      "estado": "ok",
+      "p50": 19.968,
+      "p95": 23.361,
+      "excluidos": {
+        "warmup": 5,
+        "error": 0
+      },
+      "n": 112,
+      "window_ids": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "event_id_desde": "c3-interrupcion-6",
+      "event_id_hasta": "c3-interrupcion-117"
+    },
+    "G2": {
+      "metrica": "cuadros_procesados_por_s",
+      "estado": "ok",
+      "valor": 3.972,
+      "intervalo_s": 29.203,
+      "excluidos": {
+        "error": 0
+      },
+      "n": 117,
+      "window_ids": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "event_id_desde": "c3-interrupcion-1",
+      "event_id_hasta": "c3-interrupcion-117"
+    },
+    "G3": {
+      "metrica": "ram_proceso_mib",
+      "estado": "ok",
+      "max": 184.16,
+      "ultimo": 154.09,
+      "event_id_max": "c3-interrupcion-89",
+      "n": 117,
+      "window_ids": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "event_id_desde": "c3-interrupcion-1",
+      "event_id_hasta": "c3-interrupcion-117"
+    },
+    "G4": {
+      "metrica": "proporcion_baja_confianza",
+      "estado": "ok",
+      "valor": 0.0,
+      "baja": 0,
+      "con_detecciones": 117,
+      "minimo": 10,
+      "excluidos": {
+        "sin_detecciones": 0,
+        "error": 0
+      },
+      "n": 117,
+      "window_ids": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "event_id_desde": "c3-interrupcion-1",
+      "event_id_hasta": "c3-interrupcion-117"
+    },
+    "G5": {
+      "metrica": "cobertura_trazabilidad",
+      "estado": "ok",
+      "valor": 1.0,
+      "cumplen": 117,
+      "total": 117,
+      "incumplen": [],
+      "n": 117,
+      "window_ids": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "event_id_desde": "c3-interrupcion-1",
+      "event_id_hasta": "c3-interrupcion-117"
+    },
+    "G6": {
+      "metrica": "coincidencia_version_modelo",
+      "estado": "ok",
+      "valor": 1.0,
+      "coinciden": 117,
+      "total": 117,
+      "sha256_esperado": "c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d",
+      "versiones": [
+        {
+          "model_version": "0.1.1rc0",
+          "model_sha256": "c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d",
+          "eventos": 117
+        }
+      ],
+      "n": 117,
+      "window_ids": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "event_id_desde": "c3-interrupcion-1",
+      "event_id_hasta": "c3-interrupcion-117"
+    },
+    "G7": {
+      "metrica": "alertas_activas",
+      "estado": "ok",
+      "serie": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "max_simultaneas": 0,
+      "abiertas_al_final": 0,
+      "alert_ids": [
+        "c3-interrupcion-F-1"
+      ],
+      "window_ids": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ]
+    },
+    "extras": {
+      "E1": {
+        "metrica": "proporcion_sin_detecciones",
+        "grupo": "G4",
+        "estado": "ok",
+        "valor": 0.0,
+        "sin_detecciones": 0,
+        "con_inferencia": 117,
+        "excluidos": {
+          "error": 0
+        },
+        "n": 117,
+        "window_ids": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "event_id_desde": "c3-interrupcion-1",
+        "event_id_hasta": "c3-interrupcion-117"
+      },
+      "E2": {
+        "metrica": "detecciones_por_cuadro",
+        "grupo": "G4",
+        "estado": "ok",
+        "media": 1.026,
+        "p50": 1,
+        "p90": 1,
+        "max": 2,
+        "total_detecciones": 120,
+        "histograma": {
+          "1": 114,
+          "2": 3
+        },
+        "excluidos": {
+          "error": 0
+        },
+        "n": 117,
+        "window_ids": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "event_id_desde": "c3-interrupcion-1",
+        "event_id_hasta": "c3-interrupcion-117"
+      },
+      "E3": {
+        "metrica": "predicciones_por_clase",
+        "grupo": "G4",
+        "estado": "ok",
+        "detecciones_por_clase": {
+          "person": 117,
+          "chair": 3
+        },
+        "proporcion_por_clase": {
+          "person": 0.975,
+          "chair": 0.025
+        },
+        "cuadros_por_mejor_clase": {
+          "person": 117
+        },
+        "total_detecciones": 120,
+        "excluidos": {
+          "error": 0
+        },
+        "n": 117,
+        "window_ids": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "event_id_desde": "c3-interrupcion-1",
+        "event_id_hasta": "c3-interrupcion-117"
+      }
+    }
+  },
+  "ventanas": [
+    {
+      "window_id": 1,
+      "cuadros": 20,
+      "event_id_desde": "c3-interrupcion-1",
+      "event_id_hasta": "c3-interrupcion-20",
+      "G1": {
+        "metrica": "latencia_inferencia_ms",
+        "estado": "ok",
+        "p50": 20.164,
+        "p95": 23.022,
+        "excluidos": {
+          "warmup": 5,
+          "error": 0
+        },
+        "n": 15,
+        "window_ids": [
+          1
+        ],
+        "event_id_desde": "c3-interrupcion-6",
+        "event_id_hasta": "c3-interrupcion-20"
+      },
+      "G2": {
+        "metrica": "cuadros_procesados_por_s",
+        "estado": "ok",
+        "valor": 4.994,
+        "intervalo_s": 3.805,
+        "excluidos": {
+          "error": 0
+        },
+        "n": 20,
+        "window_ids": [
+          1
+        ],
+        "event_id_desde": "c3-interrupcion-1",
+        "event_id_hasta": "c3-interrupcion-20"
+      },
+      "G3": {
+        "metrica": "ram_proceso_mib",
+        "estado": "ok",
+        "max": 168.88,
+        "ultimo": 168.88,
+        "event_id_max": "c3-interrupcion-20",
+        "n": 20,
+        "window_ids": [
+          1
+        ],
+        "event_id_desde": "c3-interrupcion-1",
+        "event_id_hasta": "c3-interrupcion-20"
+      },
+      "G4": {
+        "metrica": "proporcion_baja_confianza",
+        "estado": "ok",
+        "valor": 0.0,
+        "baja": 0,
+        "con_detecciones": 20,
+        "minimo": 10,
+        "excluidos": {
+          "sin_detecciones": 0,
+          "error": 0
+        },
+        "n": 20,
+        "window_ids": [
+          1
+        ],
+        "event_id_desde": "c3-interrupcion-1",
+        "event_id_hasta": "c3-interrupcion-20"
+      },
+      "G5": {
+        "metrica": "cobertura_trazabilidad",
+        "estado": "ok",
+        "valor": 1.0,
+        "cumplen": 20,
+        "total": 20,
+        "incumplen": [],
+        "n": 20,
+        "window_ids": [
+          1
+        ],
+        "event_id_desde": "c3-interrupcion-1",
+        "event_id_hasta": "c3-interrupcion-20"
+      },
+      "G6": {
+        "metrica": "coincidencia_version_modelo",
+        "estado": "ok",
+        "valor": 1.0,
+        "coinciden": 20,
+        "total": 20,
+        "sha256_esperado": "c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d",
+        "versiones": [
+          {
+            "model_version": "0.1.1rc0",
+            "model_sha256": "c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d",
+            "eventos": 20
+          }
+        ],
+        "n": 20,
+        "window_ids": [
+          1
+        ],
+        "event_id_desde": "c3-interrupcion-1",
+        "event_id_hasta": "c3-interrupcion-20"
+      },
+      "G7": {
+        "metrica": "alertas_activas",
+        "estado": "ok",
+        "valor": 0,
+        "alert_ids": [],
+        "window_ids": [
+          1
+        ]
+      },
+      "extras": {
+        "E1": {
+          "metrica": "proporcion_sin_detecciones",
+          "grupo": "G4",
+          "estado": "ok",
+          "valor": 0.0,
+          "sin_detecciones": 0,
+          "con_inferencia": 20,
+          "excluidos": {
+            "error": 0
+          },
+          "n": 20,
+          "window_ids": [
+            1
+          ],
+          "event_id_desde": "c3-interrupcion-1",
+          "event_id_hasta": "c3-interrupcion-20"
+        },
+        "E2": {
+          "metrica": "detecciones_por_cuadro",
+          "grupo": "G4",
+          "estado": "ok",
+          "media": 1.15,
+          "p50": 1,
+          "p90": 2,
+          "max": 2,
+          "total_detecciones": 23,
+          "histograma": {
+            "1": 17,
+            "2": 3
+          },
+          "excluidos": {
+            "error": 0
+          },
+          "n": 20,
+          "window_ids": [
+            1
+          ],
+          "event_id_desde": "c3-interrupcion-1",
+          "event_id_hasta": "c3-interrupcion-20"
+        },
+        "E3": {
+          "metrica": "predicciones_por_clase",
+          "grupo": "G4",
+          "estado": "ok",
+          "detecciones_por_clase": {
+            "person": 20,
+            "chair": 3
+          },
+          "proporcion_por_clase": {
+            "person": 0.8696,
+            "chair": 0.1304
+          },
+          "cuadros_por_mejor_clase": {
+            "person": 20
+          },
+          "total_detecciones": 23,
+          "excluidos": {
+            "error": 0
+          },
+          "n": 20,
+          "window_ids": [
+            1
+          ],
+          "event_id_desde": "c3-interrupcion-1",
+          "event_id_hasta": "c3-interrupcion-20"
+        }
+      }
+    },
+    {
+      "window_id": 2,
+      "cuadros": 20,
+      "event_id_desde": "c3-interrupcion-21",
+      "event_id_hasta": "c3-interrupcion-40",
+      "G1": {
+        "metrica": "latencia_inferencia_ms",
+        "estado": "ok",
+        "p50": 19.564,
+        "p95": 39.39,
+        "excluidos": {
+          "warmup": 0,
+          "error": 0
+        },
+        "n": 20,
+        "window_ids": [
+          2
+        ],
+        "event_id_desde": "c3-interrupcion-21",
+        "event_id_hasta": "c3-interrupcion-40"
+      },
+      "G2": {
+        "metrica": "cuadros_procesados_por_s",
+        "estado": "ok",
+        "valor": 5.001,
+        "intervalo_s": 3.799,
+        "excluidos": {
+          "error": 0
+        },
+        "n": 20,
+        "window_ids": [
+          2
+        ],
+        "event_id_desde": "c3-interrupcion-21",
+        "event_id_hasta": "c3-interrupcion-40"
+      },
+      "G3": {
+        "metrica": "ram_proceso_mib",
+        "estado": "ok",
+        "max": 173.11,
+        "ultimo": 173.11,
+        "event_id_max": "c3-interrupcion-40",
+        "n": 20,
+        "window_ids": [
+          2
+        ],
+        "event_id_desde": "c3-interrupcion-21",
+        "event_id_hasta": "c3-interrupcion-40"
+      },
+      "G4": {
+        "metrica": "proporcion_baja_confianza",
+        "estado": "ok",
+        "valor": 0.0,
+        "baja": 0,
+        "con_detecciones": 20,
+        "minimo": 10,
+        "excluidos": {
+          "sin_detecciones": 0,
+          "error": 0
+        },
+        "n": 20,
+        "window_ids": [
+          2
+        ],
+        "event_id_desde": "c3-interrupcion-21",
+        "event_id_hasta": "c3-interrupcion-40"
+      },
+      "G5": {
+        "metrica": "cobertura_trazabilidad",
+        "estado": "ok",
+        "valor": 1.0,
+        "cumplen": 20,
+        "total": 20,
+        "incumplen": [],
+        "n": 20,
+        "window_ids": [
+          2
+        ],
+        "event_id_desde": "c3-interrupcion-21",
+        "event_id_hasta": "c3-interrupcion-40"
+      },
+      "G6": {
+        "metrica": "coincidencia_version_modelo",
+        "estado": "ok",
+        "valor": 1.0,
+        "coinciden": 20,
+        "total": 20,
+        "sha256_esperado": "c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d",
+        "versiones": [
+          {
+            "model_version": "0.1.1rc0",
+            "model_sha256": "c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d",
+            "eventos": 20
+          }
+        ],
+        "n": 20,
+        "window_ids": [
+          2
+        ],
+        "event_id_desde": "c3-interrupcion-21",
+        "event_id_hasta": "c3-interrupcion-40"
+      },
+      "G7": {
+        "metrica": "alertas_activas",
+        "estado": "ok",
+        "valor": 0,
+        "alert_ids": [],
+        "window_ids": [
+          2
+        ]
+      },
+      "extras": {
+        "E1": {
+          "metrica": "proporcion_sin_detecciones",
+          "grupo": "G4",
+          "estado": "ok",
+          "valor": 0.0,
+          "sin_detecciones": 0,
+          "con_inferencia": 20,
+          "excluidos": {
+            "error": 0
+          },
+          "n": 20,
+          "window_ids": [
+            2
+          ],
+          "event_id_desde": "c3-interrupcion-21",
+          "event_id_hasta": "c3-interrupcion-40"
+        },
+        "E2": {
+          "metrica": "detecciones_por_cuadro",
+          "grupo": "G4",
+          "estado": "ok",
+          "media": 1.0,
+          "p50": 1,
+          "p90": 1,
+          "max": 1,
+          "total_detecciones": 20,
+          "histograma": {
+            "1": 20
+          },
+          "excluidos": {
+            "error": 0
+          },
+          "n": 20,
+          "window_ids": [
+            2
+          ],
+          "event_id_desde": "c3-interrupcion-21",
+          "event_id_hasta": "c3-interrupcion-40"
+        },
+        "E3": {
+          "metrica": "predicciones_por_clase",
+          "grupo": "G4",
+          "estado": "ok",
+          "detecciones_por_clase": {
+            "person": 20
+          },
+          "proporcion_por_clase": {
+            "person": 1.0
+          },
+          "cuadros_por_mejor_clase": {
+            "person": 20
+          },
+          "total_detecciones": 20,
+          "excluidos": {
+            "error": 0
+          },
+          "n": 20,
+          "window_ids": [
+            2
+          ],
+          "event_id_desde": "c3-interrupcion-21",
+          "event_id_hasta": "c3-interrupcion-40"
+        }
+      }
+    },
+    {
+      "window_id": 3,
+      "cuadros": 20,
+      "event_id_desde": "c3-interrupcion-41",
+      "event_id_hasta": "c3-interrupcion-60",
+      "G1": {
+        "metrica": "latencia_inferencia_ms",
+        "estado": "ok",
+        "p50": 13.404,
+        "p95": 21.696,
+        "excluidos": {
+          "warmup": 0,
+          "error": 0
+        },
+        "n": 20,
+        "window_ids": [
+          3
+        ],
+        "event_id_desde": "c3-interrupcion-41",
+        "event_id_hasta": "c3-interrupcion-60"
+      },
+      "G2": {
+        "metrica": "cuadros_procesados_por_s",
+        "estado": "ok",
+        "valor": 5.002,
+        "intervalo_s": 3.799,
+        "excluidos": {
+          "error": 0
+        },
+        "n": 20,
+        "window_ids": [
+          3
+        ],
+        "event_id_desde": "c3-interrupcion-41",
+        "event_id_hasta": "c3-interrupcion-60"
+      },
+      "G3": {
+        "metrica": "ram_proceso_mib",
+        "estado": "ok",
+        "max": 180.02,
+        "ultimo": 180.02,
+        "event_id_max": "c3-interrupcion-51",
+        "n": 20,
+        "window_ids": [
+          3
+        ],
+        "event_id_desde": "c3-interrupcion-41",
+        "event_id_hasta": "c3-interrupcion-60"
+      },
+      "G4": {
+        "metrica": "proporcion_baja_confianza",
+        "estado": "ok",
+        "valor": 0.0,
+        "baja": 0,
+        "con_detecciones": 20,
+        "minimo": 10,
+        "excluidos": {
+          "sin_detecciones": 0,
+          "error": 0
+        },
+        "n": 20,
+        "window_ids": [
+          3
+        ],
+        "event_id_desde": "c3-interrupcion-41",
+        "event_id_hasta": "c3-interrupcion-60"
+      },
+      "G5": {
+        "metrica": "cobertura_trazabilidad",
+        "estado": "ok",
+        "valor": 1.0,
+        "cumplen": 20,
+        "total": 20,
+        "incumplen": [],
+        "n": 20,
+        "window_ids": [
+          3
+        ],
+        "event_id_desde": "c3-interrupcion-41",
+        "event_id_hasta": "c3-interrupcion-60"
+      },
+      "G6": {
+        "metrica": "coincidencia_version_modelo",
+        "estado": "ok",
+        "valor": 1.0,
+        "coinciden": 20,
+        "total": 20,
+        "sha256_esperado": "c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d",
+        "versiones": [
+          {
+            "model_version": "0.1.1rc0",
+            "model_sha256": "c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d",
+            "eventos": 20
+          }
+        ],
+        "n": 20,
+        "window_ids": [
+          3
+        ],
+        "event_id_desde": "c3-interrupcion-41",
+        "event_id_hasta": "c3-interrupcion-60"
+      },
+      "G7": {
+        "metrica": "alertas_activas",
+        "estado": "ok",
+        "valor": 0,
+        "alert_ids": [],
+        "window_ids": [
+          3
+        ]
+      },
+      "extras": {
+        "E1": {
+          "metrica": "proporcion_sin_detecciones",
+          "grupo": "G4",
+          "estado": "ok",
+          "valor": 0.0,
+          "sin_detecciones": 0,
+          "con_inferencia": 20,
+          "excluidos": {
+            "error": 0
+          },
+          "n": 20,
+          "window_ids": [
+            3
+          ],
+          "event_id_desde": "c3-interrupcion-41",
+          "event_id_hasta": "c3-interrupcion-60"
+        },
+        "E2": {
+          "metrica": "detecciones_por_cuadro",
+          "grupo": "G4",
+          "estado": "ok",
+          "media": 1.0,
+          "p50": 1,
+          "p90": 1,
+          "max": 1,
+          "total_detecciones": 20,
+          "histograma": {
+            "1": 20
+          },
+          "excluidos": {
+            "error": 0
+          },
+          "n": 20,
+          "window_ids": [
+            3
+          ],
+          "event_id_desde": "c3-interrupcion-41",
+          "event_id_hasta": "c3-interrupcion-60"
+        },
+        "E3": {
+          "metrica": "predicciones_por_clase",
+          "grupo": "G4",
+          "estado": "ok",
+          "detecciones_por_clase": {
+            "person": 20
+          },
+          "proporcion_por_clase": {
+            "person": 1.0
+          },
+          "cuadros_por_mejor_clase": {
+            "person": 20
+          },
+          "total_detecciones": 20,
+          "excluidos": {
+            "error": 0
+          },
+          "n": 20,
+          "window_ids": [
+            3
+          ],
+          "event_id_desde": "c3-interrupcion-41",
+          "event_id_hasta": "c3-interrupcion-60"
+        }
+      }
+    },
+    {
+      "window_id": 4,
+      "cuadros": 20,
+      "event_id_desde": "c3-interrupcion-61",
+      "event_id_hasta": "c3-interrupcion-80",
+      "G1": {
+        "metrica": "latencia_inferencia_ms",
+        "estado": "ok",
+        "p50": 21.401,
+        "p95": 22.88,
+        "excluidos": {
+          "warmup": 0,
+          "error": 0
+        },
+        "n": 20,
+        "window_ids": [
+          4
+        ],
+        "event_id_desde": "c3-interrupcion-61",
+        "event_id_hasta": "c3-interrupcion-80"
+      },
+      "G2": {
+        "metrica": "cuadros_procesados_por_s",
+        "estado": "ok",
+        "valor": 1.939,
+        "intervalo_s": 9.801,
+        "excluidos": {
+          "error": 0
+        },
+        "n": 20,
+        "window_ids": [
+          4
+        ],
+        "event_id_desde": "c3-interrupcion-61",
+        "event_id_hasta": "c3-interrupcion-80"
+      },
+      "G3": {
+        "metrica": "ram_proceso_mib",
+        "estado": "ok",
+        "max": 181.52,
+        "ultimo": 181.52,
+        "event_id_max": "c3-interrupcion-78",
+        "n": 20,
+        "window_ids": [
+          4
+        ],
+        "event_id_desde": "c3-interrupcion-61",
+        "event_id_hasta": "c3-interrupcion-80"
+      },
+      "G4": {
+        "metrica": "proporcion_baja_confianza",
+        "estado": "ok",
+        "valor": 0.0,
+        "baja": 0,
+        "con_detecciones": 20,
+        "minimo": 10,
+        "excluidos": {
+          "sin_detecciones": 0,
+          "error": 0
+        },
+        "n": 20,
+        "window_ids": [
+          4
+        ],
+        "event_id_desde": "c3-interrupcion-61",
+        "event_id_hasta": "c3-interrupcion-80"
+      },
+      "G5": {
+        "metrica": "cobertura_trazabilidad",
+        "estado": "ok",
+        "valor": 1.0,
+        "cumplen": 20,
+        "total": 20,
+        "incumplen": [],
+        "n": 20,
+        "window_ids": [
+          4
+        ],
+        "event_id_desde": "c3-interrupcion-61",
+        "event_id_hasta": "c3-interrupcion-80"
+      },
+      "G6": {
+        "metrica": "coincidencia_version_modelo",
+        "estado": "ok",
+        "valor": 1.0,
+        "coinciden": 20,
+        "total": 20,
+        "sha256_esperado": "c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d",
+        "versiones": [
+          {
+            "model_version": "0.1.1rc0",
+            "model_sha256": "c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d",
+            "eventos": 20
+          }
+        ],
+        "n": 20,
+        "window_ids": [
+          4
+        ],
+        "event_id_desde": "c3-interrupcion-61",
+        "event_id_hasta": "c3-interrupcion-80"
+      },
+      "G7": {
+        "metrica": "alertas_activas",
+        "estado": "ok",
+        "valor": 0,
+        "alert_ids": [],
+        "window_ids": [
+          4
+        ]
+      },
+      "extras": {
+        "E1": {
+          "metrica": "proporcion_sin_detecciones",
+          "grupo": "G4",
+          "estado": "ok",
+          "valor": 0.0,
+          "sin_detecciones": 0,
+          "con_inferencia": 20,
+          "excluidos": {
+            "error": 0
+          },
+          "n": 20,
+          "window_ids": [
+            4
+          ],
+          "event_id_desde": "c3-interrupcion-61",
+          "event_id_hasta": "c3-interrupcion-80"
+        },
+        "E2": {
+          "metrica": "detecciones_por_cuadro",
+          "grupo": "G4",
+          "estado": "ok",
+          "media": 1.0,
+          "p50": 1,
+          "p90": 1,
+          "max": 1,
+          "total_detecciones": 20,
+          "histograma": {
+            "1": 20
+          },
+          "excluidos": {
+            "error": 0
+          },
+          "n": 20,
+          "window_ids": [
+            4
+          ],
+          "event_id_desde": "c3-interrupcion-61",
+          "event_id_hasta": "c3-interrupcion-80"
+        },
+        "E3": {
+          "metrica": "predicciones_por_clase",
+          "grupo": "G4",
+          "estado": "ok",
+          "detecciones_por_clase": {
+            "person": 20
+          },
+          "proporcion_por_clase": {
+            "person": 1.0
+          },
+          "cuadros_por_mejor_clase": {
+            "person": 20
+          },
+          "total_detecciones": 20,
+          "excluidos": {
+            "error": 0
+          },
+          "n": 20,
+          "window_ids": [
+            4
+          ],
+          "event_id_desde": "c3-interrupcion-61",
+          "event_id_hasta": "c3-interrupcion-80"
+        }
+      }
+    },
+    {
+      "window_id": 5,
+      "cuadros": 20,
+      "event_id_desde": "c3-interrupcion-81",
+      "event_id_hasta": "c3-interrupcion-100",
+      "G1": {
+        "metrica": "latencia_inferencia_ms",
+        "estado": "ok",
+        "p50": 17.991,
+        "p95": 22.005,
+        "excluidos": {
+          "warmup": 0,
+          "error": 0
+        },
+        "n": 20,
+        "window_ids": [
+          5
+        ],
+        "event_id_desde": "c3-interrupcion-81",
+        "event_id_hasta": "c3-interrupcion-100"
+      },
+      "G2": {
+        "metrica": "cuadros_procesados_por_s",
+        "estado": "ok",
+        "valor": 5.002,
+        "intervalo_s": 3.798,
+        "excluidos": {
+          "error": 0
+        },
+        "n": 20,
+        "window_ids": [
+          5
+        ],
+        "event_id_desde": "c3-interrupcion-81",
+        "event_id_hasta": "c3-interrupcion-100"
+      },
+      "G3": {
+        "metrica": "ram_proceso_mib",
+        "estado": "ok",
+        "max": 184.16,
+        "ultimo": 184.09,
+        "event_id_max": "c3-interrupcion-89",
+        "n": 20,
+        "window_ids": [
+          5
+        ],
+        "event_id_desde": "c3-interrupcion-81",
+        "event_id_hasta": "c3-interrupcion-100"
+      },
+      "G4": {
+        "metrica": "proporcion_baja_confianza",
+        "estado": "ok",
+        "valor": 0.0,
+        "baja": 0,
+        "con_detecciones": 20,
+        "minimo": 10,
+        "excluidos": {
+          "sin_detecciones": 0,
+          "error": 0
+        },
+        "n": 20,
+        "window_ids": [
+          5
+        ],
+        "event_id_desde": "c3-interrupcion-81",
+        "event_id_hasta": "c3-interrupcion-100"
+      },
+      "G5": {
+        "metrica": "cobertura_trazabilidad",
+        "estado": "ok",
+        "valor": 1.0,
+        "cumplen": 20,
+        "total": 20,
+        "incumplen": [],
+        "n": 20,
+        "window_ids": [
+          5
+        ],
+        "event_id_desde": "c3-interrupcion-81",
+        "event_id_hasta": "c3-interrupcion-100"
+      },
+      "G6": {
+        "metrica": "coincidencia_version_modelo",
+        "estado": "ok",
+        "valor": 1.0,
+        "coinciden": 20,
+        "total": 20,
+        "sha256_esperado": "c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d",
+        "versiones": [
+          {
+            "model_version": "0.1.1rc0",
+            "model_sha256": "c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d",
+            "eventos": 20
+          }
+        ],
+        "n": 20,
+        "window_ids": [
+          5
+        ],
+        "event_id_desde": "c3-interrupcion-81",
+        "event_id_hasta": "c3-interrupcion-100"
+      },
+      "G7": {
+        "metrica": "alertas_activas",
+        "estado": "ok",
+        "valor": 0,
+        "alert_ids": [],
+        "window_ids": [
+          5
+        ]
+      },
+      "extras": {
+        "E1": {
+          "metrica": "proporcion_sin_detecciones",
+          "grupo": "G4",
+          "estado": "ok",
+          "valor": 0.0,
+          "sin_detecciones": 0,
+          "con_inferencia": 20,
+          "excluidos": {
+            "error": 0
+          },
+          "n": 20,
+          "window_ids": [
+            5
+          ],
+          "event_id_desde": "c3-interrupcion-81",
+          "event_id_hasta": "c3-interrupcion-100"
+        },
+        "E2": {
+          "metrica": "detecciones_por_cuadro",
+          "grupo": "G4",
+          "estado": "ok",
+          "media": 1.0,
+          "p50": 1,
+          "p90": 1,
+          "max": 1,
+          "total_detecciones": 20,
+          "histograma": {
+            "1": 20
+          },
+          "excluidos": {
+            "error": 0
+          },
+          "n": 20,
+          "window_ids": [
+            5
+          ],
+          "event_id_desde": "c3-interrupcion-81",
+          "event_id_hasta": "c3-interrupcion-100"
+        },
+        "E3": {
+          "metrica": "predicciones_por_clase",
+          "grupo": "G4",
+          "estado": "ok",
+          "detecciones_por_clase": {
+            "person": 20
+          },
+          "proporcion_por_clase": {
+            "person": 1.0
+          },
+          "cuadros_por_mejor_clase": {
+            "person": 20
+          },
+          "total_detecciones": 20,
+          "excluidos": {
+            "error": 0
+          },
+          "n": 20,
+          "window_ids": [
+            5
+          ],
+          "event_id_desde": "c3-interrupcion-81",
+          "event_id_hasta": "c3-interrupcion-100"
+        }
+      }
+    },
+    {
+      "window_id": 6,
+      "cuadros": 17,
+      "event_id_desde": "c3-interrupcion-101",
+      "event_id_hasta": "c3-interrupcion-117",
+      "G1": {
+        "metrica": "latencia_inferencia_ms",
+        "estado": "ok",
+        "p50": 21.054,
+        "p95": 23.99,
+        "excluidos": {
+          "warmup": 0,
+          "error": 0
+        },
+        "n": 17,
+        "window_ids": [
+          6
+        ],
+        "event_id_desde": "c3-interrupcion-101",
+        "event_id_hasta": "c3-interrupcion-117"
+      },
+      "G2": {
+        "metrica": "cuadros_procesados_por_s",
+        "estado": "ok",
+        "valor": 5.003,
+        "intervalo_s": 3.198,
+        "excluidos": {
+          "error": 0
+        },
+        "n": 17,
+        "window_ids": [
+          6
+        ],
+        "event_id_desde": "c3-interrupcion-101",
+        "event_id_hasta": "c3-interrupcion-117"
+      },
+      "G3": {
+        "metrica": "ram_proceso_mib",
+        "estado": "ok",
+        "max": 184.11,
+        "ultimo": 154.09,
+        "event_id_max": "c3-interrupcion-102",
+        "n": 17,
+        "window_ids": [
+          6
+        ],
+        "event_id_desde": "c3-interrupcion-101",
+        "event_id_hasta": "c3-interrupcion-117"
+      },
+      "G4": {
+        "metrica": "proporcion_baja_confianza",
+        "estado": "ok",
+        "valor": 0.0,
+        "baja": 0,
+        "con_detecciones": 17,
+        "minimo": 10,
+        "excluidos": {
+          "sin_detecciones": 0,
+          "error": 0
+        },
+        "n": 17,
+        "window_ids": [
+          6
+        ],
+        "event_id_desde": "c3-interrupcion-101",
+        "event_id_hasta": "c3-interrupcion-117"
+      },
+      "G5": {
+        "metrica": "cobertura_trazabilidad",
+        "estado": "ok",
+        "valor": 1.0,
+        "cumplen": 17,
+        "total": 17,
+        "incumplen": [],
+        "n": 17,
+        "window_ids": [
+          6
+        ],
+        "event_id_desde": "c3-interrupcion-101",
+        "event_id_hasta": "c3-interrupcion-117"
+      },
+      "G6": {
+        "metrica": "coincidencia_version_modelo",
+        "estado": "ok",
+        "valor": 1.0,
+        "coinciden": 17,
+        "total": 17,
+        "sha256_esperado": "c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d",
+        "versiones": [
+          {
+            "model_version": "0.1.1rc0",
+            "model_sha256": "c789161ed43c8269fcd4e67c67eeeb4e80c622da2eb296a20bc6007bd18a0b7d",
+            "eventos": 17
+          }
+        ],
+        "n": 17,
+        "window_ids": [
+          6
+        ],
+        "event_id_desde": "c3-interrupcion-101",
+        "event_id_hasta": "c3-interrupcion-117"
+      },
+      "G7": {
+        "metrica": "alertas_activas",
+        "estado": "ok",
+        "valor": 0,
+        "alert_ids": [],
+        "window_ids": [
+          6
+        ]
+      },
+      "extras": {
+        "E1": {
+          "metrica": "proporcion_sin_detecciones",
+          "grupo": "G4",
+          "estado": "ok",
+          "valor": 0.0,
+          "sin_detecciones": 0,
+          "con_inferencia": 17,
+          "excluidos": {
+            "error": 0
+          },
+          "n": 17,
+          "window_ids": [
+            6
+          ],
+          "event_id_desde": "c3-interrupcion-101",
+          "event_id_hasta": "c3-interrupcion-117"
+        },
+        "E2": {
+          "metrica": "detecciones_por_cuadro",
+          "grupo": "G4",
+          "estado": "ok",
+          "media": 1.0,
+          "p50": 1,
+          "p90": 1,
+          "max": 1,
+          "total_detecciones": 17,
+          "histograma": {
+            "1": 17
+          },
+          "excluidos": {
+            "error": 0
+          },
+          "n": 17,
+          "window_ids": [
+            6
+          ],
+          "event_id_desde": "c3-interrupcion-101",
+          "event_id_hasta": "c3-interrupcion-117"
+        },
+        "E3": {
+          "metrica": "predicciones_por_clase",
+          "grupo": "G4",
+          "estado": "ok",
+          "detecciones_por_clase": {
+            "person": 17
+          },
+          "proporcion_por_clase": {
+            "person": 1.0
+          },
+          "cuadros_por_mejor_clase": {
+            "person": 17
+          },
+          "total_detecciones": 17,
+          "excluidos": {
+            "error": 0
+          },
+          "n": 17,
+          "window_ids": [
+            6
+          ],
+          "event_id_desde": "c3-interrupcion-101",
+          "event_id_hasta": "c3-interrupcion-117"
+        }
+      }
+    }
+  ],
+  "calculado_utc": "2026-11-13T00:26:24+00:00"
+}

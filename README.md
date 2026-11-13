@@ -13,8 +13,10 @@ Un detector de objetos YOLOX-Nano procesa un video como stream a 5 cuadros por s
 | Referencia `ref-01` | `referencia.mp4` | 51 / 93 / 3 | ninguna | [`evidencias/referencia/`](evidencias/referencia/) |
 | C1 operación normal `c1-normal` | `normal.mp4` | 129 / 18 / 0 | ninguna | [`evidencias/escenarios/c1-normal/`](evidencias/escenarios/c1-normal/) |
 | C2 baja confianza `c2-baja-confianza` | `baja_confianza.mp4` | 0 / 19 / 128 | A (ventana 1) y B (ventana 3) | [`evidencias/escenarios/c2-baja-confianza/`](evidencias/escenarios/c2-baja-confianza/) |
+| Extra · C3 interrupción `c3-interrupcion` | `normal.mp4` con 6 s sin cuadros | 99 / 18 / 0 | F: interrupción de 6.20 s, recuperada | [`evidencias/escenarios/c3-interrupcion/`](evidencias/escenarios/c3-interrupcion/) |
+| Extra · fotos del carrito `carrito-p5` | `datos/carrito/` (78 fotos de P5) | 1 / 13 / 48 (16 sin detecciones) | A y B (escena distinta de la referencia) | [`evidencias/escenarios/carrito-p5/`](evidencias/escenarios/carrito-p5/) |
 
-Las tres corridas tienen 147 cuadros, el mismo modelo (SHA-256 `c789161e…`) y la misma configuración (SHA-256 `11b06253…`). Las métricas G1–G7 de C1 y C2 y su recálculo están en [`evidencias/metricas/`](evidencias/metricas/).
+Todas las corridas usan el mismo modelo (SHA-256 `c789161e…`) y la misma configuración (SHA-256 `11b06253…`). Las métricas G1–G7 y las adicionales E1–E3 de cada corrida, y su recálculo, están en [`evidencias/metricas/`](evidencias/metricas/). Los extras están en [`evidencias/extras/`](evidencias/extras/).
 
 ## Arquitectura
 
@@ -40,7 +42,7 @@ video / carpeta / webcam ──► fuente.py ──► detector.py ──► pol
 | `detector.py` | YOLOX-Nano en ONNX Runtime (CPU): letterbox, inferencia, decodificación y NMS, con tiempos por etapa |
 | `config.py` | Lee y valida `config/monitoreo.yaml` |
 | `politica.py` | Zona de cada cuadro y resumen por ventana (suficiente o insuficiente) |
-| `alertas.py` | Reglas A y B con su ciclo de vida |
+| `alertas.py` | Reglas A y B con su ciclo de vida, y la regla F de interrupción de la fuente (extra) |
 | `capturas.py` | Qué cuadros se conservan como imagen y su verificación por SHA-256 |
 | `contrato.py` | Campos del evento y de la alerta, y su validación |
 | `almacen.py` | Base de datos SQLite y exportación a JSONL |
@@ -63,7 +65,7 @@ python3.12 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 export PYTHONPATH=src                                   # el paquete p6 no se instala; ver nota de macOS
 python scripts/descargar_modelo.py --destino modelo/    # falla si el SHA-256 no coincide
-python -m pytest                                        # 160 pruebas
+python -m pytest                                        # 173 pruebas
 ```
 
 `export PYTHONPATH=src` hace falta en cada terminal nueva.
@@ -86,6 +88,14 @@ python -m p6.monitorear --fuente datos/videos/normal.mp4 --ritmo 5 \
 # C2 · baja confianza
 python -m p6.monitorear --fuente datos/videos/baja_confianza.mp4 --ritmo 5 \
     --config config/monitoreo.yaml --run-id c2-baja-confianza
+
+# Extra · C3 interrupción del stream: 6 s sin cuadros después del cuadro 70
+python -m p6.monitorear --fuente datos/videos/normal.mp4 --ritmo 5 \
+    --config config/monitoreo.yaml --run-id c3-interrupcion --simular-corte 70:6
+
+# Extra · fotos del carrito del Proyecto 5 como segunda fuente
+python -m p6.monitorear --fuente datos/carrito --ritmo 5 \
+    --config config/monitoreo.yaml --run-id carrito-p5
 ```
 
 Cada corrida guarda sus eventos, alertas y métricas en `resultados/monitoreo.db` y escribe en `resultados/<run_id>/`:
@@ -114,6 +124,7 @@ python -m p6.portal --db evidencias/escenarios/monitoreo.db  # las corridas entr
 | Página | Contenido |
 |---|---|
 | `/eventos` | Eventos con filtros por corrida, estado, zona, ventana y captura |
+| `/eventos.csv` | Extra: los eventos filtrados, todos, en CSV (botón «Descargar CSV» en `/eventos`) |
 | `/eventos/{event_id}` | La captura con sus cajas (con el SHA-256 verificado), las detecciones, la zona, la ventana, las alertas y el enlace a la configuración |
 | `/alertas` | Alertas con estado, momento, motivo, severidad y filtros |
 | `/alertas/{alert_id}` | La regla, sus ventanas y los cuadros que la causaron, con miniaturas |
@@ -129,7 +140,9 @@ python -m p6.metricas --db resultados/monitoreo.db --run-id c2-baja-confianza   
 python -m p6.metricas --db resultados/monitoreo.db --run-id c2-baja-confianza --recalcular  # recalcula y compara
 ```
 
-`--recalcular` vuelve a calcular las 7 métricas desde los eventos, las alertas y las capturas guardadas, y las compara campo por campo con lo guardado. Termina con código 0 si coincide. Las definiciones están en [`docs/metricas.md`](docs/metricas.md).
+Además de las 7 métricas base, el documento trae 3 adicionales del grupo G4 (extra): E1 proporción de cuadros sin detecciones, E2 detecciones por cuadro y E3 predicciones por clase.
+
+`--recalcular` vuelve a calcular las 7 métricas y las adicionales desde los eventos, las alertas y las capturas guardadas, y las compara campo por campo con lo guardado. Termina con código 0 si coincide. Las definiciones están en [`docs/metricas.md`](docs/metricas.md).
 
 ## Configuración y modelo
 
@@ -175,6 +188,7 @@ La justificación de cada valor está en [`docs/politica.md`](docs/politica.md).
 - Contrato de evento y alerta.
 - Eventos persistentes en SQLite, política de capturas, reglas de alerta, métricas G1–G7 y su recálculo.
 - Portal, escenarios, evidencias y pruebas.
+- Extras: exportación a CSV, segunda fuente (fotos del carrito), métricas adicionales y escenario de interrupción con la regla F.
 
 **Componentes reutilizados:**
 
@@ -184,6 +198,7 @@ La justificación de cada valor está en [`docs/politica.md`](docs/politica.md).
 | Letterbox, decodificación y NMS del detector | `Proyecto5/src/p5/detector_onnx.py` de sebastian0023/Proyecto-3-Clasificador-de-imagenes, tag `p5-entrega` | Edith (@edithflor), equipo de P5 | Adaptado en `src/p6/detector.py`: piso configurable, cuadros en memoria, tiempos por etapa y sin el contrato de P5 |
 | Descarga del modelo con verificación | `Proyecto5/scripts/descargar_modelo.py`, mismo tag | Edith (@edithflor) | Adaptado en `scripts/descargar_modelo.py` |
 | Descriptor del modelo | `Proyecto5/modelo/descriptor.yaml`, mismo tag | Edith (@edithflor) | Adaptado en `modelo/descriptor.yaml`, sin las clases de obstáculo de P5 |
+| 78 fotos del carrito (extra #13) | `Proyecto5/datos/evaluacion/S1…S6`, mismo repositorio, commit `b63ddbc` (tag `p5-entrega`) | Capturas de Bryan (@BryanRomoG), equipo de P5 | Sin cambios en `datos/carrito/`, como fuente de tipo carpeta; sus anotaciones no se usan |
 
 Cada archivo adaptado lleva un encabezado con su origen.
 
@@ -193,7 +208,16 @@ Cada archivo adaptado lleva un encabezado con su origen.
 
 ## Extras
 
-Por ahora **no se reclaman puntos extra**. Los extras planeados están en los issues #11 a #14 del repositorio. El inventario está en [`evidencias/INDICE.md`](evidencias/INDICE.md#6-extras) y se actualizará si se agregan.
+Se reclaman seis adicionales, separados de la base. El inventario con nivel pedido, evidencia y verificación está en [`evidencias/extras/README.md`](evidencias/extras/README.md).
+
+| ID | Tipo | Elemento | Nivel pedido |
+|---|---|---|---|
+| X1 | Funcionalidad | Exportar a CSV los eventos filtrados (`/eventos.csv`) | 10 |
+| X2 | Funcionalidad | Fotos del carrito de P5 como segunda fuente | 5 |
+| X3 | Métrica | E1 · proporción de cuadros sin detecciones, por ventana | 5 |
+| X4 | Métrica | E2 · detecciones por cuadro, distribución por ventana | 5 |
+| X5 | Métrica | E3 · predicciones por clase, distribución por ventana | 5 |
+| X6 | Escenario | C3 · interrupción del stream y recuperación (regla F) | 10 |
 
 ## Límites conocidos
 
@@ -202,7 +226,7 @@ Por ahora **no se reclaman puntos extra**. Los extras planeados están en los is
   - Por eso los umbrales (0.85 y 0.90) están a solo 0.05 de distancia. «Baja» significa por debajo de lo normal en esta escena, no baja en términos absolutos.
   - Otra escena o cámara requiere una referencia nueva.
 - **Videos cortos.** Son de unos 30 s (147 cuadros, 7 ventanas completas y una parcial). Alcanza para las reglas (B necesita 3 ventanas), pero son pocas ventanas.
-- **Estados no ejercitados en C1 y C2.** Los cuadros `sin_detecciones` y `error`, y las ventanas `insuficiente` salvo la última parcial, no aparecen en las corridas entregadas. Están implementados y probados con datos sintéticos (`tests/`).
+- **Estados poco ejercitados.** C1 y C2 no tienen cuadros `sin_detecciones` ni `error`. La corrida del carrito sí tiene 16 cuadros sin detecciones y una ventana `insuficiente` completa. Los cuadros con `error` solo se prueban con datos sintéticos (`tests/`).
 - **Alertas de C2.** Terminan abiertas, porque la última ventana es insuficiente y no puede cerrarlas. La regla C (evidencia insuficiente sostenida) es opcional y no se implementó.
 - **Latencia.** A ritmo real (5 cuadros/s con espera) la latencia de inferencia ronda 18.5 ms. Sin espera ronda 7 ms. Las puntuaciones son idénticas en los dos casos.
 - **Alcance.** Una sola fuente por corrida y una base de datos local. El portal no tiene autenticación y está pensado para uso local.
@@ -218,6 +242,8 @@ Por ahora **no se reclaman puntos extra**. Los extras planeados están en los is
 | Política de capturas en `config/monitoreo.yaml` | Constantes en `src/p6/capturas.py`, registradas en cada `run.json` | La configuración ya estaba congelada y las capturas no cambian puntuaciones, zonas ni alertas |
 | G2 = n / intervalo | G2 = (n − 1) / intervalo | n cuadros delimitan n − 1 intervalos |
 | Regla C opcional | No implementada | Opcional en el plan y en la rúbrica |
+| Extra #11: «cuadros capturados por segundo» | «Predicciones por clase» (E3) | En este sistema cada cuadro entregado se procesa, así que habría sido igual a G2 |
+| Extra #14: registrar la interrupción | Regla F como constante del código | La configuración estaba congelada; la regla F no cambia puntuaciones, zonas ni las reglas A y B |
 | `pip install -e .` | `export PYTHONPATH=src` | Ver la nota de macOS |
 
 ## Nota para macOS

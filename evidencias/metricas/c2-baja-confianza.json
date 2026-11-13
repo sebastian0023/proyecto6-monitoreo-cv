@@ -18,8 +18,8 @@
     "G1": {
       "metrica": "latencia_inferencia_ms",
       "estado": "ok",
-      "p50": 18.462,
-      "p95": 22.476,
+      "p50": 19.869,
+      "p95": 23.218,
       "excluidos": {
         "warmup": 5,
         "error": 0
@@ -42,7 +42,7 @@
       "metrica": "cuadros_procesados_por_s",
       "estado": "ok",
       "valor": 4.999,
-      "intervalo_s": 29.208,
+      "intervalo_s": 29.205,
       "excluidos": {
         "error": 0
       },
@@ -63,9 +63,9 @@
     "G3": {
       "metrica": "ram_proceso_mib",
       "estado": "ok",
-      "max": 182.22,
-      "ultimo": 182.03,
-      "event_id_max": "c2-baja-confianza-139",
+      "max": 184.47,
+      "ultimo": 184.47,
+      "event_id_max": "c2-baja-confianza-140",
       "n": 147,
       "window_ids": [
         1,
@@ -183,6 +183,103 @@
         7,
         8
       ]
+    },
+    "extras": {
+      "E1": {
+        "metrica": "proporcion_sin_detecciones",
+        "grupo": "G4",
+        "estado": "ok",
+        "valor": 0.0,
+        "sin_detecciones": 0,
+        "con_inferencia": 147,
+        "excluidos": {
+          "error": 0
+        },
+        "n": 147,
+        "window_ids": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "event_id_desde": "c2-baja-confianza-1",
+        "event_id_hasta": "c2-baja-confianza-147"
+      },
+      "E2": {
+        "metrica": "detecciones_por_cuadro",
+        "grupo": "G4",
+        "estado": "ok",
+        "media": 1.136,
+        "p50": 1,
+        "p90": 2,
+        "max": 3,
+        "total_detecciones": 167,
+        "histograma": {
+          "1": 130,
+          "2": 14,
+          "3": 3
+        },
+        "excluidos": {
+          "error": 0
+        },
+        "n": 147,
+        "window_ids": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "event_id_desde": "c2-baja-confianza-1",
+        "event_id_hasta": "c2-baja-confianza-147"
+      },
+      "E3": {
+        "metrica": "predicciones_por_clase",
+        "grupo": "G4",
+        "estado": "ok",
+        "detecciones_por_clase": {
+          "person": 156,
+          "kite": 4,
+          "frisbee": 3,
+          "cat": 2,
+          "donut": 2
+        },
+        "proporcion_por_clase": {
+          "person": 0.9341,
+          "kite": 0.024,
+          "frisbee": 0.018,
+          "cat": 0.012,
+          "donut": 0.012
+        },
+        "cuadros_por_mejor_clase": {
+          "person": 146,
+          "cat": 1
+        },
+        "total_detecciones": 167,
+        "excluidos": {
+          "error": 0
+        },
+        "n": 147,
+        "window_ids": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "event_id_desde": "c2-baja-confianza-1",
+        "event_id_hasta": "c2-baja-confianza-147"
+      }
     }
   },
   "ventanas": [
@@ -194,8 +291,8 @@
       "G1": {
         "metrica": "latencia_inferencia_ms",
         "estado": "ok",
-        "p50": 18.587,
-        "p95": 22.024,
+        "p50": 19.359,
+        "p95": 42.821,
         "excluidos": {
           "warmup": 5,
           "error": 0
@@ -210,8 +307,8 @@
       "G2": {
         "metrica": "cuadros_procesados_por_s",
         "estado": "ok",
-        "valor": 4.992,
-        "intervalo_s": 3.806,
+        "valor": 4.995,
+        "intervalo_s": 3.803,
         "excluidos": {
           "error": 0
         },
@@ -225,8 +322,8 @@
       "G3": {
         "metrica": "ram_proceso_mib",
         "estado": "ok",
-        "max": 167.33,
-        "ultimo": 167.33,
+        "max": 167.77,
+        "ultimo": 167.77,
         "event_id_max": "c2-baja-confianza-20",
         "n": 20,
         "window_ids": [
@@ -298,6 +395,72 @@
         "window_ids": [
           1
         ]
+      },
+      "extras": {
+        "E1": {
+          "metrica": "proporcion_sin_detecciones",
+          "grupo": "G4",
+          "estado": "ok",
+          "valor": 0.0,
+          "sin_detecciones": 0,
+          "con_inferencia": 20,
+          "excluidos": {
+            "error": 0
+          },
+          "n": 20,
+          "window_ids": [
+            1
+          ],
+          "event_id_desde": "c2-baja-confianza-1",
+          "event_id_hasta": "c2-baja-confianza-20"
+        },
+        "E2": {
+          "metrica": "detecciones_por_cuadro",
+          "grupo": "G4",
+          "estado": "ok",
+          "media": 1.25,
+          "p50": 1,
+          "p90": 2,
+          "max": 2,
+          "total_detecciones": 25,
+          "histograma": {
+            "1": 15,
+            "2": 5
+          },
+          "excluidos": {
+            "error": 0
+          },
+          "n": 20,
+          "window_ids": [
+            1
+          ],
+          "event_id_desde": "c2-baja-confianza-1",
+          "event_id_hasta": "c2-baja-confianza-20"
+        },
+        "E3": {
+          "metrica": "predicciones_por_clase",
+          "grupo": "G4",
+          "estado": "ok",
+          "detecciones_por_clase": {
+            "person": 25
+          },
+          "proporcion_por_clase": {
+            "person": 1.0
+          },
+          "cuadros_por_mejor_clase": {
+            "person": 20
+          },
+          "total_detecciones": 25,
+          "excluidos": {
+            "error": 0
+          },
+          "n": 20,
+          "window_ids": [
+            1
+          ],
+          "event_id_desde": "c2-baja-confianza-1",
+          "event_id_hasta": "c2-baja-confianza-20"
+        }
       }
     },
     {
@@ -308,8 +471,8 @@
       "G1": {
         "metrica": "latencia_inferencia_ms",
         "estado": "ok",
-        "p50": 18.349,
-        "p95": 21.445,
+        "p50": 19.877,
+        "p95": 23.298,
         "excluidos": {
           "warmup": 0,
           "error": 0
@@ -324,8 +487,8 @@
       "G2": {
         "metrica": "cuadros_procesados_por_s",
         "estado": "ok",
-        "valor": 4.998,
-        "intervalo_s": 3.801,
+        "valor": 5.0,
+        "intervalo_s": 3.8,
         "excluidos": {
           "error": 0
         },
@@ -339,8 +502,8 @@
       "G3": {
         "metrica": "ram_proceso_mib",
         "estado": "ok",
-        "max": 170.95,
-        "ultimo": 170.95,
+        "max": 175.36,
+        "ultimo": 175.36,
         "event_id_max": "c2-baja-confianza-37",
         "n": 20,
         "window_ids": [
@@ -412,6 +575,78 @@
         "window_ids": [
           2
         ]
+      },
+      "extras": {
+        "E1": {
+          "metrica": "proporcion_sin_detecciones",
+          "grupo": "G4",
+          "estado": "ok",
+          "valor": 0.0,
+          "sin_detecciones": 0,
+          "con_inferencia": 20,
+          "excluidos": {
+            "error": 0
+          },
+          "n": 20,
+          "window_ids": [
+            2
+          ],
+          "event_id_desde": "c2-baja-confianza-21",
+          "event_id_hasta": "c2-baja-confianza-40"
+        },
+        "E2": {
+          "metrica": "detecciones_por_cuadro",
+          "grupo": "G4",
+          "estado": "ok",
+          "media": 1.3,
+          "p50": 1,
+          "p90": 2,
+          "max": 3,
+          "total_detecciones": 26,
+          "histograma": {
+            "1": 16,
+            "2": 2,
+            "3": 2
+          },
+          "excluidos": {
+            "error": 0
+          },
+          "n": 20,
+          "window_ids": [
+            2
+          ],
+          "event_id_desde": "c2-baja-confianza-21",
+          "event_id_hasta": "c2-baja-confianza-40"
+        },
+        "E3": {
+          "metrica": "predicciones_por_clase",
+          "grupo": "G4",
+          "estado": "ok",
+          "detecciones_por_clase": {
+            "person": 23,
+            "donut": 2,
+            "cat": 1
+          },
+          "proporcion_por_clase": {
+            "person": 0.8846,
+            "donut": 0.0769,
+            "cat": 0.0385
+          },
+          "cuadros_por_mejor_clase": {
+            "person": 19,
+            "cat": 1
+          },
+          "total_detecciones": 26,
+          "excluidos": {
+            "error": 0
+          },
+          "n": 20,
+          "window_ids": [
+            2
+          ],
+          "event_id_desde": "c2-baja-confianza-21",
+          "event_id_hasta": "c2-baja-confianza-40"
+        }
       }
     },
     {
@@ -422,8 +657,8 @@
       "G1": {
         "metrica": "latencia_inferencia_ms",
         "estado": "ok",
-        "p50": 17.919,
-        "p95": 22.337,
+        "p50": 20.634,
+        "p95": 23.365,
         "excluidos": {
           "warmup": 0,
           "error": 0
@@ -438,8 +673,8 @@
       "G2": {
         "metrica": "cuadros_procesados_por_s",
         "estado": "ok",
-        "valor": 5.004,
-        "intervalo_s": 3.797,
+        "valor": 5.0,
+        "intervalo_s": 3.8,
         "excluidos": {
           "error": 0
         },
@@ -453,8 +688,8 @@
       "G3": {
         "metrica": "ram_proceso_mib",
         "estado": "ok",
-        "max": 180.25,
-        "ultimo": 180.25,
+        "max": 182.08,
+        "ultimo": 182.08,
         "event_id_max": "c2-baja-confianza-59",
         "n": 20,
         "window_ids": [
@@ -527,6 +762,78 @@
         "window_ids": [
           3
         ]
+      },
+      "extras": {
+        "E1": {
+          "metrica": "proporcion_sin_detecciones",
+          "grupo": "G4",
+          "estado": "ok",
+          "valor": 0.0,
+          "sin_detecciones": 0,
+          "con_inferencia": 20,
+          "excluidos": {
+            "error": 0
+          },
+          "n": 20,
+          "window_ids": [
+            3
+          ],
+          "event_id_desde": "c2-baja-confianza-41",
+          "event_id_hasta": "c2-baja-confianza-60"
+        },
+        "E2": {
+          "metrica": "detecciones_por_cuadro",
+          "grupo": "G4",
+          "estado": "ok",
+          "media": 1.25,
+          "p50": 1,
+          "p90": 2,
+          "max": 2,
+          "total_detecciones": 25,
+          "histograma": {
+            "1": 15,
+            "2": 5
+          },
+          "excluidos": {
+            "error": 0
+          },
+          "n": 20,
+          "window_ids": [
+            3
+          ],
+          "event_id_desde": "c2-baja-confianza-41",
+          "event_id_hasta": "c2-baja-confianza-60"
+        },
+        "E3": {
+          "metrica": "predicciones_por_clase",
+          "grupo": "G4",
+          "estado": "ok",
+          "detecciones_por_clase": {
+            "person": 21,
+            "frisbee": 2,
+            "cat": 1,
+            "kite": 1
+          },
+          "proporcion_por_clase": {
+            "person": 0.84,
+            "frisbee": 0.08,
+            "cat": 0.04,
+            "kite": 0.04
+          },
+          "cuadros_por_mejor_clase": {
+            "person": 20
+          },
+          "total_detecciones": 25,
+          "excluidos": {
+            "error": 0
+          },
+          "n": 20,
+          "window_ids": [
+            3
+          ],
+          "event_id_desde": "c2-baja-confianza-41",
+          "event_id_hasta": "c2-baja-confianza-60"
+        }
       }
     },
     {
@@ -537,8 +844,8 @@
       "G1": {
         "metrica": "latencia_inferencia_ms",
         "estado": "ok",
-        "p50": 17.358,
-        "p95": 21.484,
+        "p50": 19.223,
+        "p95": 21.787,
         "excluidos": {
           "warmup": 0,
           "error": 0
@@ -568,9 +875,9 @@
       "G3": {
         "metrica": "ram_proceso_mib",
         "estado": "ok",
-        "max": 180.36,
-        "ultimo": 180.27,
-        "event_id_max": "c2-baja-confianza-67",
+        "max": 184.17,
+        "ultimo": 184.08,
+        "event_id_max": "c2-baja-confianza-75",
         "n": 20,
         "window_ids": [
           4
@@ -642,6 +949,77 @@
         "window_ids": [
           4
         ]
+      },
+      "extras": {
+        "E1": {
+          "metrica": "proporcion_sin_detecciones",
+          "grupo": "G4",
+          "estado": "ok",
+          "valor": 0.0,
+          "sin_detecciones": 0,
+          "con_inferencia": 20,
+          "excluidos": {
+            "error": 0
+          },
+          "n": 20,
+          "window_ids": [
+            4
+          ],
+          "event_id_desde": "c2-baja-confianza-61",
+          "event_id_hasta": "c2-baja-confianza-80"
+        },
+        "E2": {
+          "metrica": "detecciones_por_cuadro",
+          "grupo": "G4",
+          "estado": "ok",
+          "media": 1.15,
+          "p50": 1,
+          "p90": 1,
+          "max": 3,
+          "total_detecciones": 23,
+          "histograma": {
+            "1": 18,
+            "2": 1,
+            "3": 1
+          },
+          "excluidos": {
+            "error": 0
+          },
+          "n": 20,
+          "window_ids": [
+            4
+          ],
+          "event_id_desde": "c2-baja-confianza-61",
+          "event_id_hasta": "c2-baja-confianza-80"
+        },
+        "E3": {
+          "metrica": "predicciones_por_clase",
+          "grupo": "G4",
+          "estado": "ok",
+          "detecciones_por_clase": {
+            "person": 20,
+            "kite": 2,
+            "frisbee": 1
+          },
+          "proporcion_por_clase": {
+            "person": 0.8696,
+            "kite": 0.087,
+            "frisbee": 0.0435
+          },
+          "cuadros_por_mejor_clase": {
+            "person": 20
+          },
+          "total_detecciones": 23,
+          "excluidos": {
+            "error": 0
+          },
+          "n": 20,
+          "window_ids": [
+            4
+          ],
+          "event_id_desde": "c2-baja-confianza-61",
+          "event_id_hasta": "c2-baja-confianza-80"
+        }
       }
     },
     {
@@ -652,8 +1030,8 @@
       "G1": {
         "metrica": "latencia_inferencia_ms",
         "estado": "ok",
-        "p50": 18.462,
-        "p95": 25.022,
+        "p50": 19.733,
+        "p95": 23.218,
         "excluidos": {
           "warmup": 0,
           "error": 0
@@ -668,8 +1046,8 @@
       "G2": {
         "metrica": "cuadros_procesados_por_s",
         "estado": "ok",
-        "valor": 4.988,
-        "intervalo_s": 3.809,
+        "valor": 4.996,
+        "intervalo_s": 3.803,
         "excluidos": {
           "error": 0
         },
@@ -683,9 +1061,9 @@
       "G3": {
         "metrica": "ram_proceso_mib",
         "estado": "ok",
-        "max": 180.72,
-        "ultimo": 180.72,
-        "event_id_max": "c2-baja-confianza-94",
+        "max": 184.38,
+        "ultimo": 184.38,
+        "event_id_max": "c2-baja-confianza-98",
         "n": 20,
         "window_ids": [
           5
@@ -757,6 +1135,71 @@
         "window_ids": [
           5
         ]
+      },
+      "extras": {
+        "E1": {
+          "metrica": "proporcion_sin_detecciones",
+          "grupo": "G4",
+          "estado": "ok",
+          "valor": 0.0,
+          "sin_detecciones": 0,
+          "con_inferencia": 20,
+          "excluidos": {
+            "error": 0
+          },
+          "n": 20,
+          "window_ids": [
+            5
+          ],
+          "event_id_desde": "c2-baja-confianza-81",
+          "event_id_hasta": "c2-baja-confianza-100"
+        },
+        "E2": {
+          "metrica": "detecciones_por_cuadro",
+          "grupo": "G4",
+          "estado": "ok",
+          "media": 1.0,
+          "p50": 1,
+          "p90": 1,
+          "max": 1,
+          "total_detecciones": 20,
+          "histograma": {
+            "1": 20
+          },
+          "excluidos": {
+            "error": 0
+          },
+          "n": 20,
+          "window_ids": [
+            5
+          ],
+          "event_id_desde": "c2-baja-confianza-81",
+          "event_id_hasta": "c2-baja-confianza-100"
+        },
+        "E3": {
+          "metrica": "predicciones_por_clase",
+          "grupo": "G4",
+          "estado": "ok",
+          "detecciones_por_clase": {
+            "person": 20
+          },
+          "proporcion_por_clase": {
+            "person": 1.0
+          },
+          "cuadros_por_mejor_clase": {
+            "person": 20
+          },
+          "total_detecciones": 20,
+          "excluidos": {
+            "error": 0
+          },
+          "n": 20,
+          "window_ids": [
+            5
+          ],
+          "event_id_desde": "c2-baja-confianza-81",
+          "event_id_hasta": "c2-baja-confianza-100"
+        }
       }
     },
     {
@@ -767,8 +1210,8 @@
       "G1": {
         "metrica": "latencia_inferencia_ms",
         "estado": "ok",
-        "p50": 18.477,
-        "p95": 22.759,
+        "p50": 19.484,
+        "p95": 22.638,
         "excluidos": {
           "warmup": 0,
           "error": 0
@@ -783,8 +1226,8 @@
       "G2": {
         "metrica": "cuadros_procesados_por_s",
         "estado": "ok",
-        "valor": 5.01,
-        "intervalo_s": 3.792,
+        "valor": 4.999,
+        "intervalo_s": 3.8,
         "excluidos": {
           "error": 0
         },
@@ -798,9 +1241,9 @@
       "G3": {
         "metrica": "ram_proceso_mib",
         "estado": "ok",
-        "max": 181.0,
-        "ultimo": 180.97,
-        "event_id_max": "c2-baja-confianza-114",
+        "max": 184.41,
+        "ultimo": 184.36,
+        "event_id_max": "c2-baja-confianza-107",
         "n": 20,
         "window_ids": [
           6
@@ -872,6 +1315,74 @@
         "window_ids": [
           6
         ]
+      },
+      "extras": {
+        "E1": {
+          "metrica": "proporcion_sin_detecciones",
+          "grupo": "G4",
+          "estado": "ok",
+          "valor": 0.0,
+          "sin_detecciones": 0,
+          "con_inferencia": 20,
+          "excluidos": {
+            "error": 0
+          },
+          "n": 20,
+          "window_ids": [
+            6
+          ],
+          "event_id_desde": "c2-baja-confianza-101",
+          "event_id_hasta": "c2-baja-confianza-120"
+        },
+        "E2": {
+          "metrica": "detecciones_por_cuadro",
+          "grupo": "G4",
+          "estado": "ok",
+          "media": 1.05,
+          "p50": 1,
+          "p90": 1,
+          "max": 2,
+          "total_detecciones": 21,
+          "histograma": {
+            "1": 19,
+            "2": 1
+          },
+          "excluidos": {
+            "error": 0
+          },
+          "n": 20,
+          "window_ids": [
+            6
+          ],
+          "event_id_desde": "c2-baja-confianza-101",
+          "event_id_hasta": "c2-baja-confianza-120"
+        },
+        "E3": {
+          "metrica": "predicciones_por_clase",
+          "grupo": "G4",
+          "estado": "ok",
+          "detecciones_por_clase": {
+            "person": 20,
+            "kite": 1
+          },
+          "proporcion_por_clase": {
+            "person": 0.9524,
+            "kite": 0.0476
+          },
+          "cuadros_por_mejor_clase": {
+            "person": 20
+          },
+          "total_detecciones": 21,
+          "excluidos": {
+            "error": 0
+          },
+          "n": 20,
+          "window_ids": [
+            6
+          ],
+          "event_id_desde": "c2-baja-confianza-101",
+          "event_id_hasta": "c2-baja-confianza-120"
+        }
       }
     },
     {
@@ -882,8 +1393,8 @@
       "G1": {
         "metrica": "latencia_inferencia_ms",
         "estado": "ok",
-        "p50": 18.625,
-        "p95": 22.476,
+        "p50": 18.918,
+        "p95": 22.91,
         "excluidos": {
           "warmup": 0,
           "error": 0
@@ -898,8 +1409,8 @@
       "G2": {
         "metrica": "cuadros_procesados_por_s",
         "estado": "ok",
-        "valor": 5.003,
-        "intervalo_s": 3.798,
+        "valor": 5.0,
+        "intervalo_s": 3.8,
         "excluidos": {
           "error": 0
         },
@@ -913,9 +1424,9 @@
       "G3": {
         "metrica": "ram_proceso_mib",
         "estado": "ok",
-        "max": 182.22,
-        "ultimo": 181.97,
-        "event_id_max": "c2-baja-confianza-139",
+        "max": 184.47,
+        "ultimo": 184.47,
+        "event_id_max": "c2-baja-confianza-140",
         "n": 20,
         "window_ids": [
           7
@@ -987,6 +1498,71 @@
         "window_ids": [
           7
         ]
+      },
+      "extras": {
+        "E1": {
+          "metrica": "proporcion_sin_detecciones",
+          "grupo": "G4",
+          "estado": "ok",
+          "valor": 0.0,
+          "sin_detecciones": 0,
+          "con_inferencia": 20,
+          "excluidos": {
+            "error": 0
+          },
+          "n": 20,
+          "window_ids": [
+            7
+          ],
+          "event_id_desde": "c2-baja-confianza-121",
+          "event_id_hasta": "c2-baja-confianza-140"
+        },
+        "E2": {
+          "metrica": "detecciones_por_cuadro",
+          "grupo": "G4",
+          "estado": "ok",
+          "media": 1.0,
+          "p50": 1,
+          "p90": 1,
+          "max": 1,
+          "total_detecciones": 20,
+          "histograma": {
+            "1": 20
+          },
+          "excluidos": {
+            "error": 0
+          },
+          "n": 20,
+          "window_ids": [
+            7
+          ],
+          "event_id_desde": "c2-baja-confianza-121",
+          "event_id_hasta": "c2-baja-confianza-140"
+        },
+        "E3": {
+          "metrica": "predicciones_por_clase",
+          "grupo": "G4",
+          "estado": "ok",
+          "detecciones_por_clase": {
+            "person": 20
+          },
+          "proporcion_por_clase": {
+            "person": 1.0
+          },
+          "cuadros_por_mejor_clase": {
+            "person": 20
+          },
+          "total_detecciones": 20,
+          "excluidos": {
+            "error": 0
+          },
+          "n": 20,
+          "window_ids": [
+            7
+          ],
+          "event_id_desde": "c2-baja-confianza-121",
+          "event_id_hasta": "c2-baja-confianza-140"
+        }
       }
     },
     {
@@ -997,8 +1573,8 @@
       "G1": {
         "metrica": "latencia_inferencia_ms",
         "estado": "ok",
-        "p50": 17.405,
-        "p95": 19.521,
+        "p50": 22.303,
+        "p95": 22.937,
         "excluidos": {
           "warmup": 0,
           "error": 0
@@ -1028,9 +1604,9 @@
       "G3": {
         "metrica": "ram_proceso_mib",
         "estado": "ok",
-        "max": 182.03,
-        "ultimo": 182.03,
-        "event_id_max": "c2-baja-confianza-142",
+        "max": 184.47,
+        "ultimo": 184.47,
+        "event_id_max": "c2-baja-confianza-141",
         "n": 7,
         "window_ids": [
           8
@@ -1102,8 +1678,73 @@
         "window_ids": [
           8
         ]
+      },
+      "extras": {
+        "E1": {
+          "metrica": "proporcion_sin_detecciones",
+          "grupo": "G4",
+          "estado": "ok",
+          "valor": 0.0,
+          "sin_detecciones": 0,
+          "con_inferencia": 7,
+          "excluidos": {
+            "error": 0
+          },
+          "n": 7,
+          "window_ids": [
+            8
+          ],
+          "event_id_desde": "c2-baja-confianza-141",
+          "event_id_hasta": "c2-baja-confianza-147"
+        },
+        "E2": {
+          "metrica": "detecciones_por_cuadro",
+          "grupo": "G4",
+          "estado": "ok",
+          "media": 1.0,
+          "p50": 1,
+          "p90": 1,
+          "max": 1,
+          "total_detecciones": 7,
+          "histograma": {
+            "1": 7
+          },
+          "excluidos": {
+            "error": 0
+          },
+          "n": 7,
+          "window_ids": [
+            8
+          ],
+          "event_id_desde": "c2-baja-confianza-141",
+          "event_id_hasta": "c2-baja-confianza-147"
+        },
+        "E3": {
+          "metrica": "predicciones_por_clase",
+          "grupo": "G4",
+          "estado": "ok",
+          "detecciones_por_clase": {
+            "person": 7
+          },
+          "proporcion_por_clase": {
+            "person": 1.0
+          },
+          "cuadros_por_mejor_clase": {
+            "person": 7
+          },
+          "total_detecciones": 7,
+          "excluidos": {
+            "error": 0
+          },
+          "n": 7,
+          "window_ids": [
+            8
+          ],
+          "event_id_desde": "c2-baja-confianza-141",
+          "event_id_hasta": "c2-baja-confianza-147"
+        }
       }
     }
   ],
-  "calculado_utc": "2026-11-12T07:16:43+00:00"
+  "calculado_utc": "2026-11-13T00:25:55+00:00"
 }

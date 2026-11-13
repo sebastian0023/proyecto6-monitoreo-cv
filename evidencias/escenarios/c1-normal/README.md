@@ -3,7 +3,7 @@
 ## Entrada y comando
 
 - **Entrada:** `datos/videos/normal.mp4` (SHA-256 `01ad6ffa103aaf49f938bb081795267498a45199db9ad7ebc08755d57cb6cf19`). Es otra toma de la misma escena y la misma luz que la referencia: 640×480, 15 cuadros/s, 29.3 s.
-- **Comando exacto** (commit `9a4ba47`, árbol limpio, 2026-11-12 07:15:45 UTC):
+- **Comando exacto** (commit `3dc1c44`, árbol limpio, 2026-11-13 00:24:56 UTC):
 
   ```bash
   export PYTHONPATH=src
@@ -12,7 +12,7 @@
   ```
 
 - **Configuración:** SHA-256 `11b06253…500a3f`, la misma que la referencia y C2.
-- **Stream:** 1 de cada 3 cuadros del video, entregados a 5 cuadros/s con espera real (medido: 5.021 cuadros/s; G2: 4.998).
+- **Stream:** 1 de cada 3 cuadros del video, entregados a 5 cuadros/s con espera real (medido: 5.021 cuadros/s; G2: 4.999).
 
 ## Esperado y observado
 
@@ -20,7 +20,8 @@
 |---|---|
 | Inferencias reales | 147 cuadros, los 147 con detecciones del modelo (SHA-256 `c789161e…`); 0 sin detecciones y 0 errores |
 | La mayoría de cuadros en zona aceptada o duda | aceptada 129, duda 18, **baja 0**. `frame_score` de 0.8925 a 0.9234 (p50 0.9074) |
-| Métricas coherentes | G1 p50 18.6 ms / p95 22.3 ms · G2 5.0 cuadros/s · G3 máx. 182 MiB · G4 0.0 (0 de 147) · G5 1.0 · G6 1.0 · G7 0 alertas en las 8 ventanas |
+| Métricas coherentes | G1 p50 18.8 ms / p95 23.8 ms · G2 5.0 cuadros/s · G3 máx. 184 MiB · G4 0.0 (0 de 147) · G5 1.0 · G6 1.0 · G7 0 alertas en las 8 ventanas |
+| (métricas adicionales, extra #11) | E1 0.0 sin detecciones · E2 1.03 detecciones por cuadro (máx. 2) · E3 person 147, chair 3, bottle 1 |
 | Sin alertas falsas, o alertas que cumplen su regla | **Ninguna alerta.** Las 7 ventanas completas tienen proporción baja 0.0, por debajo de A (0.50) y de B (0.2204); la ventana 8 (7 cuadros) es insuficiente |
 | Eventos persistidos y consultables | 147 eventos en `monitoreo.db` y en `eventos.jsonl`, contrato completo (etapa H4, 0 rechazados) |
 | Capturas según la política | 8 capturas por muestra (cuadros 1, 21, …, 141), todas con SHA-256 verificado. No hay cuadros bajos ni ventanas con alerta |
@@ -51,4 +52,4 @@ La ausencia de alertas sale de una medición, no de falta de datos: G4 es 0.0 so
 
 ## Nota sobre la latencia
 
-A 5 cuadros/s con espera entre cuadros, la latencia de inferencia (G1) fue de unos 18.5 ms (p50), y en las corridas sin espera (`--sin-pausa`) de unos 7 ms. Las puntuaciones son idénticas en los dos modos. Probablemente el procesador baja su frecuencia en la espera entre cuadros. Se reporta el valor medido en la corrida real.
+A 5 cuadros/s con espera entre cuadros, la latencia de inferencia (G1) fue de unos 19 ms (p50), y en las corridas sin espera (`--sin-pausa`) de unos 7 ms. Las puntuaciones son idénticas en los dos modos. Probablemente el procesador baja su frecuencia en la espera entre cuadros. Se reporta el valor medido en la corrida real.

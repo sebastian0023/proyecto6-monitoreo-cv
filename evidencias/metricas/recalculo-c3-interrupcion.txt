@@ -1,0 +1,22 @@
+recálculo de las métricas de c3-interrupcion desde evidencias/escenarios/monitoreo.db (guardadas el 2026-11-13T00:26:24+00:00)
+G1 latencia de inferencia: p50 19.968 ms, p95 23.361 ms (n=112)
+G2 cuadros procesados por segundo: 3.972 (n=117)
+G3 RAM del proceso: máximo 184.16 MiB, último 154.09 MiB
+G4 proporción de baja confianza: 0.0 (0 de 117 con detecciones)
+G5 cobertura de trazabilidad: 1.0 (117 de 117)
+G6 coincidencia de versión del modelo: 1.0 (117 de 117; 1 versión(es))
+G7 alertas activas por ventana: [0, 0, 0, 0, 0, 0] (máximo 0, abiertas al final 0)
+extra E1 cuadros sin detecciones: 0.0 (0 de 117)
+extra E2 detecciones por cuadro: media 1.026, p50 1, p90 1, máximo 2
+extra E3 predicciones por clase: {'person': 117, 'chair': 3}
+G1: coincide (corrida y 6 ventanas)
+G2: coincide (corrida y 6 ventanas)
+G3: coincide (corrida y 6 ventanas)
+G4: coincide (corrida y 6 ventanas)
+G5: coincide (corrida y 6 ventanas)
+G6: coincide (corrida y 6 ventanas)
+G7: coincide (corrida y 6 ventanas)
+E1: coincide (corrida y 6 ventanas)
+E2: coincide (corrida y 6 ventanas)
+E3: coincide (corrida y 6 ventanas)
+resultado: todo coincide

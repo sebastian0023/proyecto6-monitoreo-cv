@@ -3,7 +3,7 @@
 ## Entrada y comando
 
 - **Entrada:** `datos/videos/baja_confianza.mp4` (SHA-256 `9393e680716f14652a69f9d66b927a8853658b59553fb6c53c0115ef029876bb`). La misma escena con poca luz y la persona solo en parte dentro del cuadro: 640×480, 15 cuadros/s, 29.3 s. Ver en `datos/videos/README.md` por qué así: oscurecer o desenfocar no bajaba las puntuaciones de este detector.
-- **Comando exacto** (commit `9a4ba47`, árbol limpio, 2026-11-12 07:16:14 UTC):
+- **Comando exacto** (commit `3dc1c44`, árbol limpio, 2026-11-13 00:25:25 UTC):
 
   ```bash
   export PYTHONPATH=src
@@ -12,7 +12,7 @@
   ```
 
 - **Configuración:** SHA-256 `11b06253…500a3f`, la misma que la referencia y C1. Los umbrales (0.85 y 0.90) se fijaron solo con la referencia, antes de esta corrida.
-- **Stream:** 1 de cada 3 cuadros, a 5 cuadros/s con espera real (medido: 5.021 cuadros/s; G2: 4.999).
+- **Stream:** 1 de cada 3 cuadros, a 5 cuadros/s con espera real (medido: 5.020 cuadros/s; G2: 4.999).
 
 ## Esperado y observado
 
@@ -23,7 +23,8 @@
 | Capturas conservadas | 139 capturas, todas con SHA-256 verificado: los 128 cuadros bajos, 10 cuadros no bajos de las ventanas que abrieron alerta (1 y 3) y 1 de muestra |
 | Alerta A abierta según su regla | **`c2-baja-confianza-A-1`** (warning) se abre en la **ventana 1**: proporción baja 0.70 ≥ 0.50 (14 de 20 cuadros con detecciones). Sigue en las ventanas 2 a 7 (0.85, 0.80, 0.80, 1.00, 0.90, 1.00) |
 | (regla sostenida, R3.3) | **`c2-baja-confianza-B-1`** (critical) se abre en la **ventana 3**: proporción baja > 0.2204 en 3 ventanas suficientes seguidas (0.70, 0.85, 0.80) |
-| Métricas | G1 p50 18.5 ms / p95 22.5 ms · G2 5.0 cuadros/s · G3 máx. 182 MiB · G4 0.8707 · G5 1.0 · G6 1.0 · G7 por ventana 1, 1, 2, 2, 2, 2, 2, 2 |
+| Métricas | G1 p50 19.9 ms / p95 23.2 ms · G2 5.0 cuadros/s · G3 máx. 184 MiB · G4 0.8707 · G5 1.0 · G6 1.0 · G7 por ventana 1, 1, 2, 2, 2, 2, 2, 2 |
+| (métricas adicionales, extra #11) | E1 0.0 sin detecciones · E2 1.14 detecciones por cuadro (máx. 3) · E3 person 156 y, a diferencia de C1, clases que no están en la escena: kite 4, frisbee 3, cat 2, donut 2 |
 
 Las dos alertas **siguen abiertas** al terminar. La última ventana (8) tiene 7 cuadros y es insuficiente, y una ventana insuficiente no cierra una alerta: sin evidencia no se afirma que el problema terminó. Cada alerta lleva sus 7 ventanas y los 121 cuadros bajos que la explican.
 

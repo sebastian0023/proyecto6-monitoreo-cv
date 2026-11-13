@@ -1,7 +1,7 @@
 {
   "run_id": "c1-normal",
-  "inicio_utc": "2026-11-12T07:15:45+00:00",
-  "fin_utc": "2026-11-12T07:16:14+00:00",
+  "inicio_utc": "2026-11-13T00:24:56+00:00",
+  "fin_utc": "2026-11-13T00:25:25+00:00",
   "fuente": {
     "source_id": "video:normal.mp4",
     "source_kind": "video",
@@ -35,7 +35,7 @@
     "onnxruntime": "1.30.0",
     "opencv": "5.0.0",
     "numpy": "2.5.4",
-    "git_commit": "9a4ba475de4532be2174ed155869be94d0ced684",
+    "git_commit": "3dc1c44df3fe164fc1370f15bf4725d5aa78ccde",
     "git_arbol_con_cambios": false
   },
   "cuadros_warmup": 5,
@@ -55,6 +55,12 @@
       "condicion": "proporción baja >= proporcion_minima en una ventana suficiente",
       "proporcion_minima": 0.5,
       "severidad": "warning"
+    },
+    "regla_F": {
+      "condicion": "hueco entre cuadros seguidos mayor que 5 intervalos esperados",
+      "umbral_s": 1.0,
+      "severidad": "critical",
+      "nota": "extra #14; constante del código, no está en config/monitoreo.yaml"
     },
     "regla_B": {
       "condicion": "proporción baja > p_ref + margen en N ventanas suficientes seguidas",
@@ -233,7 +239,7 @@
         "event_id_hasta": "c1-normal-147"
       }
     ],
-    "duracion_s": 29.276,
+    "duracion_s": 29.279,
     "cuadros_por_s_medido": 5.021
   }
 }

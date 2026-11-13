@@ -1,0 +1,1 @@
+﻿event_id,run_id,frame_id,t_capture_utc,source_id,origen,status,error_msg,frame_score,zone,window_id,n_detecciones,mejor_clase,mejor_score,detections,t_pre_ms,t_infer_ms,t_post_ms,rss_mb,warmup,model_version,model_sha256,config_sha256,image_ref,image_sha256,image_reason,captura
