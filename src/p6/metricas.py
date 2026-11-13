@@ -211,6 +211,85 @@ def g7_alertas_corrida(alertas: list[dict[str, Any]], ventanas: list[int]) -> di
     }
 
 
+# ---- métricas adicionales (extras, #11) -----------------------------------------------
+# Tres indicadores del grupo G4 distintos de su métrica base (proporción de baja confianza).
+# Población común: cuadros con inferencia completada (`ok` y `sin_detecciones`); se excluyen
+# los cuadros con `error`, que no tienen salida del modelo. La unidad de conteo de E2 y E3 es
+# la detección: una candidata con puntuación ≥ piso que sobrevivió al NMS.
+
+
+def e1_sin_detecciones(eventos: list[dict[str, Any]]) -> dict[str, Any]:
+    """Proporción de cuadros sin detecciones entre los cuadros con inferencia completada."""
+    pob = [e for e in eventos if e["status"] in COMPLETADOS]
+    sin = sum(1 for e in pob if e["status"] == "sin_detecciones")
+    return {
+        "metrica": "proporcion_sin_detecciones",
+        "grupo": "G4",
+        "estado": "ok" if pob else SIN_DATOS,
+        "valor": round(sin / len(pob), 4) if pob else None,
+        "sin_detecciones": sin,
+        "con_inferencia": len(pob),
+        "excluidos": {"error": sum(1 for e in eventos if e["status"] == "error")},
+        **_poblacion(pob),
+    }
+
+
+def e2_detecciones_por_cuadro(eventos: list[dict[str, Any]]) -> dict[str, Any]:
+    """Distribución del número de detecciones por cuadro (0 en los cuadros sin detecciones)."""
+    pob = [e for e in eventos if e["status"] in COMPLETADOS]
+    n = [len(e["detections"]) for e in pob]
+    histograma: dict[str, int] = {}
+    for k in sorted(set(n)):
+        histograma[str(k)] = n.count(k)
+    return {
+        "metrica": "detecciones_por_cuadro",
+        "grupo": "G4",
+        "estado": "ok" if pob else SIN_DATOS,
+        "media": round(sum(n) / len(n), 3) if n else None,
+        "p50": percentil(n, 50),
+        "p90": percentil(n, 90),
+        "max": max(n, default=None),
+        "total_detecciones": sum(n),
+        "histograma": histograma,
+        "excluidos": {"error": sum(1 for e in eventos if e["status"] == "error")},
+        **_poblacion(pob),
+    }
+
+
+def e3_predicciones_por_clase(eventos: list[dict[str, Any]]) -> dict[str, Any]:
+    """Detecciones por clase y cuadros por clase de su mejor detección."""
+    pob = [e for e in eventos if e["status"] in COMPLETADOS]
+    por_clase: dict[str, int] = {}
+    por_mejor: dict[str, int] = {}
+    for e in pob:
+        for d in e["detections"]:
+            por_clase[d["class_name"]] = por_clase.get(d["class_name"], 0) + 1
+        if e["detections"]:
+            mejor = max(e["detections"], key=lambda d: d["score"])["class_name"]
+            por_mejor[mejor] = por_mejor.get(mejor, 0) + 1
+    orden = lambda d: dict(sorted(d.items(), key=lambda kv: (-kv[1], kv[0])))  # noqa: E731
+    total = sum(por_clase.values())
+    return {
+        "metrica": "predicciones_por_clase",
+        "grupo": "G4",
+        "estado": "ok" if pob else SIN_DATOS,
+        "detecciones_por_clase": orden(por_clase),
+        "proporcion_por_clase": {k: round(v / total, 4) for k, v in orden(por_clase).items()},
+        "cuadros_por_mejor_clase": orden(por_mejor),
+        "total_detecciones": total,
+        "excluidos": {"error": sum(1 for e in eventos if e["status"] == "error")},
+        **_poblacion(pob),
+    }
+
+
+def extras(eventos: list[dict[str, Any]]) -> dict[str, Any]:
+    return {
+        "E1": e1_sin_detecciones(eventos),
+        "E2": e2_detecciones_por_cuadro(eventos),
+        "E3": e3_predicciones_por_clase(eventos),
+    }
+
+
 # ---- documento completo --------------------------------------------------------------
 def calcular(
     run_id: str,
@@ -220,7 +299,8 @@ def calcular(
     sha_esperado: str,
     minimo_g4: int = MINIMO_G4,
 ) -> dict[str, Any]:
-    """Las 7 métricas de una corrida, para la corrida entera y para cada ventana."""
+    """Las 7 métricas base de una corrida (y las 3 adicionales en `extras`), para la corrida
+    entera y para cada ventana."""
     ventanas = sorted({e["window_id"] for e in eventos})
     por_ventana = []
     for w in ventanas:
@@ -237,6 +317,7 @@ def calcular(
                 "G5": g5_trazabilidad(evs, carpeta),
                 "G6": g6_version(evs, sha_esperado),
                 "G7": g7_alertas_ventana(alertas, w),
+                "extras": extras(evs),
             }
         )
     return {
@@ -252,6 +333,7 @@ def calcular(
             "G5": g5_trazabilidad(eventos, carpeta),
             "G6": g6_version(eventos, sha_esperado),
             "G7": g7_alertas_corrida(alertas, ventanas),
+            "extras": extras(eventos),
         },
         "ventanas": por_ventana,
     }
@@ -327,6 +409,7 @@ def resumen(documento: dict[str, Any]) -> list[str]:
     c = documento["corrida"]
     f = lambda r, k, fmt="{}": fmt.format(r[k]) if r[k] is not None else r["estado"]  # noqa: E731
     g = c["G7"]
+    x = c["extras"]
     return [
         f"G1 latencia de inferencia: p50 {f(c['G1'], 'p50')} ms, p95 {f(c['G1'], 'p95')} ms "
         f"(n={c['G1']['n']})",
@@ -340,6 +423,11 @@ def resumen(documento: dict[str, Any]) -> list[str]:
         f"({c['G6']['coinciden']} de {c['G6']['total']}; {len(c['G6']['versiones'])} versión(es))",
         f"G7 alertas activas por ventana: {g['serie']} "
         f"(máximo {g['max_simultaneas']}, abiertas al final {g['abiertas_al_final']})",
+        f"extra E1 cuadros sin detecciones: {f(x['E1'], 'valor')} "
+        f"({x['E1']['sin_detecciones']} de {x['E1']['con_inferencia']})",
+        f"extra E2 detecciones por cuadro: media {f(x['E2'], 'media')}, p50 {f(x['E2'], 'p50')}, "
+        f"p90 {f(x['E2'], 'p90')}, máximo {f(x['E2'], 'max')}",
+        f"extra E3 predicciones por clase: {x['E3']['detecciones_por_clase']}",
     ]
 
 
@@ -372,7 +460,7 @@ def main(argv: list[str] | None = None) -> int:
         f"(guardadas el {guardado.get('calculado_utc')})",
         *resumen(nuevo),
     ]
-    for g in ("G1", "G2", "G3", "G4", "G5", "G6", "G7"):
+    for g in ("G1", "G2", "G3", "G4", "G5", "G6", "G7", "E1", "E2", "E3"):
         propias = [d for d in difs if f".{g}." in f".{d}"]
         lineas.append(
             f"{g}: {'coincide' if not propias else 'NO coincide'} (corrida y "

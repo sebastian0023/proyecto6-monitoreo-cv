@@ -234,6 +234,7 @@ def test_recalcular_coincide_y_detecta_cambios(corrida, capsys):
     )
     texto = informe.read_text()
     assert codigo == 1 and "G3: NO coincide" in texto and "G1: coincide" in texto
+    assert "E1: coincide" in texto and "E3: coincide" in texto
     assert "corrida.G3.max: " in texto and "999.0" in texto
 
 
@@ -244,3 +245,67 @@ def test_calcular_y_guardar_desde_la_cli(corrida, capsys):
     assert (salida / "metricas.json").exists()
     assert "G4 proporción de baja confianza: 0.4444" in capsys.readouterr().out
     assert metricas.main(["--db", str(db_ruta), "--run-id", "nada"]) == 2
+
+
+# ---- métricas adicionales (extras, #11) ----------------------------------------------
+def det(clase: str, score: float) -> dict:
+    return {"class_id": 0, "class_name": clase, "score": score, "bbox": [0.0, 0.0, 1.0, 1.0]}
+
+
+def test_e1_ejemplo_del_documento():
+    # 7 con detecciones, 2 sin detecciones y 1 error -> 2 / 9
+    evs = [ev(i) for i in range(1, 8)] + [sin_det(8), sin_det(9), error(10)]
+    r = metricas.e1_sin_detecciones(evs)
+    assert (r["estado"], r["valor"], r["sin_detecciones"], r["con_inferencia"]) == (
+        "ok",
+        0.2222,
+        2,
+        9,
+    )
+    assert r["excluidos"] == {"error": 1} and r["n"] == 9 and r["grupo"] == "G4"
+    assert metricas.e1_sin_detecciones([error(1)])["estado"] == SIN_DATOS
+
+
+def test_e2_ejemplo_del_documento():
+    # detecciones por cuadro 0, 1, 1, 2, 3 (más un error que no cuenta)
+    evs = [
+        sin_det(1),
+        ev(2, detections=[det("person", 0.9)], frame_score=0.9),
+        ev(3, detections=[det("person", 0.9)], frame_score=0.9),
+        ev(4, detections=[det("person", 0.9), det("cup", 0.5)], frame_score=0.9),
+        ev(5, detections=[det("person", 0.9), det("cup", 0.5), det("chair", 0.2)], frame_score=0.9),
+        error(6),
+    ]
+    r = metricas.e2_detecciones_por_cuadro(evs)
+    assert (r["media"], r["p50"], r["p90"], r["max"], r["total_detecciones"]) == (1.4, 1, 3, 3, 7)
+    assert r["histograma"] == {"0": 1, "1": 2, "2": 1, "3": 1}
+    assert r["excluidos"] == {"error": 1} and r["n"] == 5
+    assert metricas.e2_detecciones_por_cuadro([])["estado"] == SIN_DATOS
+
+
+def test_e3_ejemplo_del_documento():
+    evs = [
+        ev(1, detections=[det("person", 0.9), det("chair", 0.3)], frame_score=0.9),
+        ev(2, detections=[det("person", 0.8)], frame_score=0.8),
+        ev(3, detections=[det("cup", 0.6), det("person", 0.5)], frame_score=0.6),
+        sin_det(4),
+    ]
+    r = metricas.e3_predicciones_por_clase(evs)
+    assert r["detecciones_por_clase"] == {"person": 3, "chair": 1, "cup": 1}
+    assert r["proporcion_por_clase"] == {"person": 0.6, "chair": 0.2, "cup": 0.2}
+    assert r["cuadros_por_mejor_clase"] == {"person": 2, "cup": 1}
+    assert r["total_detecciones"] == 5 and r["n"] == 4
+    vacio = metricas.e3_predicciones_por_clase([sin_det(1)])
+    assert (
+        vacio["estado"] == "ok" and vacio["detecciones_por_clase"] == {}
+    )  # 0 detecciones es un dato
+    assert metricas.e3_predicciones_por_clase([])["estado"] == SIN_DATOS
+
+
+def test_los_extras_van_aparte_por_corrida_y_por_ventana(tmp_path):
+    evs = [ev(i) for i in range(1, 22)]
+    doc = calcular("r", evs, [], tmp_path, SHA)
+    assert set(doc["corrida"]["extras"]) == {"E1", "E2", "E3"}
+    assert all(set(v["extras"]) == {"E1", "E2", "E3"} for v in doc["ventanas"])
+    assert doc["ventanas"][1]["extras"]["E2"]["n"] == 1  # la ventana 2 tiene 1 cuadro
+    assert not ({"E1", "E2", "E3"} & set(doc["corrida"]))  # no se mezclan con G1–G7

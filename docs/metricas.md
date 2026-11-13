@@ -178,3 +178,56 @@ python -m p6.metricas --db resultados/monitoreo.db --run-id c2-baja-confianza --
 Pruebas (`tests/test_metricas.py`): cada métrica con el ejemplo de la sección 3, incluidos sus casos `sin datos` e `insuficiente`; el documento por corrida y por ventana con su trazabilidad; y el recálculo, que coincide y detecta un dato primario alterado.
 
 Los resultados de C1 y C2 y su recálculo están en [`evidencias/metricas/`](../evidencias/metricas/).
+
+## 6. Métricas adicionales (extras, #11)
+
+Tres indicadores más del grupo **G4** (comportamiento de las predicciones). Son distintos de su métrica base (la proporción de baja confianza): usan otra parte de la salida del modelo y su resultado no se deduce de ella. Se calculan con el mismo código, el mismo recálculo y la misma trazabilidad que las métricas base, en un bloque `extras` aparte, por corrida y por cada ventana (`metricas.json` → `corrida.extras` y `ventanas[i].extras`).
+
+**Población común:** cuadros con inferencia completada (`status` `ok` o `sin_detecciones`). Los cuadros con `error` se excluyen y se cuentan aparte, porque no tienen salida del modelo. Si no hay cuadros en la población, el estado es `sin datos`. La **unidad de conteo** de E2 y E3 es la detección: una candidata con puntuación ≥ piso (0.10) que sobrevivió al NMS.
+
+### E1 · Proporción de cuadros sin detecciones
+
+| | |
+|---|---|
+| **Qué mide** | Qué parte de los cuadros procesados no tuvo ninguna detección sobre el piso. No es un error ni confianza cero: es un estado aparte |
+| **Unidad** | proporción entre 0 y 1, con los conteos |
+| **Fórmula** | `cuadros con status = sin_detecciones / cuadros con inferencia completada` |
+| **Ventana** | Por ventana y por corrida |
+| **Exclusiones** | `error` |
+| **Sin observaciones** | `sin datos` |
+| **Adquisición** | `status` de cada evento (`monitorear.py`, según la salida del detector) |
+| **Código** | `metricas.py::e1_sin_detecciones` |
+
+**Ejemplo (ilustrativo).** 7 cuadros con detecciones, 2 sin detecciones y 1 con error: **E1 = 2 / 9 = 0.2222**, con el error excluido.
+
+### E2 · Detecciones por cuadro
+
+| | |
+|---|---|
+| **Qué mide** | Cuántas detecciones entrega el modelo por cuadro, como distribución. Un cambio indica que el modelo «ve» más o menos objetos de lo habitual |
+| **Unidad** | detecciones por cuadro |
+| **Fórmula** | Para cada cuadro, `n = len(detections)` (0 en los cuadros sin detecciones). Se reportan la media, el p50 y el p90 por rango más cercano, el máximo, el total y el histograma `{n: cuadros}` |
+| **Ventana** | Por ventana y por corrida |
+| **Exclusiones** | `error` |
+| **Sin observaciones** | `sin datos` |
+| **Adquisición** | `detections` de cada evento |
+| **Código** | `metricas.py::e2_detecciones_por_cuadro` |
+
+**Ejemplo (ilustrativo).** Cuadros con 0, 1, 1, 2 y 3 detecciones: **media 7 / 5 = 1.4**, p50 = 1 (posición 3 de 5), p90 = 3 (posición 5), máximo 3, histograma `{0: 1, 1: 2, 2: 1, 3: 1}`.
+
+### E3 · Predicciones por clase
+
+| | |
+|---|---|
+| **Qué mide** | Qué clases predice el modelo y con qué frecuencia. En una escena fija, la aparición de clases nuevas indica que el modelo está confundido |
+| **Unidad** | detecciones por clase (y su proporción); además, cuadros por la clase de su mejor detección |
+| **Fórmula** | `detecciones_por_clase[c]` = detecciones de la clase c; `proporcion_por_clase[c]` = esas detecciones / total de detecciones; `cuadros_por_mejor_clase[c]` = cuadros cuya detección de mayor puntuación es de la clase c |
+| **Ventana** | Por ventana y por corrida |
+| **Exclusiones** | `error` |
+| **Sin observaciones** | `sin datos` si no hay cuadros. Con cuadros pero sin detecciones, el resultado es una distribución vacía (`{}`), que es un dato válido |
+| **Adquisición** | `detections[].class_name` y `score` de cada evento |
+| **Código** | `metricas.py::e3_predicciones_por_clase` |
+
+**Ejemplo (ilustrativo).** Cuadro 1: person 0.9 y chair 0.3; cuadro 2: person 0.8; cuadro 3: cup 0.6 y person 0.5; cuadro 4: sin detecciones. Detecciones por clase **person 3, chair 1, cup 1** (proporciones 0.6, 0.2, 0.2); cuadros por mejor clase **person 2, cup 1**.
+
+**Pruebas y recálculo.** `tests/test_metricas.py` comprueba los tres ejemplos de arriba y sus casos `sin datos`. `python -m p6.metricas --recalcular` informa E1, E2 y E3 junto con G1–G7.
